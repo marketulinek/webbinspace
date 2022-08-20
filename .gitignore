@@ -5,6 +5,9 @@ __pycache__/
 .env
 venv/
 
+# App stuff:
+source_data/
+
 # Django stuff:
 *.log
 *.pot
