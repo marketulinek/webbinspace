@@ -9,7 +9,7 @@ class Report(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return '%i_report_%i' % (self.package_number, self.date_code)
+        return '%s_report_%i' % (self.package_number, self.date_code)
 
     def get_absolute_url(self):
         return reverse('report_detail', args=[self.date_code])
