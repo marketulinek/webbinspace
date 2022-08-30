@@ -7,7 +7,7 @@ import requests
 # TODO: function that will send warning email and raise CommandError
 
 class Command(BaseCommand):
-    # TODO: Write help
+    help = 'Scrape urls that contains report text files and downloads them to a predetermined folder.'
 
     def handle(self, *args, **options):
 
