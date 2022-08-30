@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from bs4 import BeautifulSoup
+from webb.models import Report
 import requests
 
 
@@ -50,15 +51,37 @@ class Command(BaseCommand):
 
             title_cycle = title[0].text.split(' ')
             cycle_number = title_cycle[1]
-            print(cycle_number)
 
 
             # II. Scraping report links
-            # TODO
+            links = tablist[0].find_all('a')
+            
+            saved_reports = Report.objects.filter(cycle=cycle_number).values_list('package_number', flat=True)
 
-            # III.
-            # 1) save to model Report (to be aware that it exist)
-            # 2) Save .txt file for further data scraping
+            for link in reversed(links):
+
+                file_name = link['href'].split('/')[-1]
+                package_number = file_name.split('_')[0]
+
+                if package_number in saved_reports:
+                    # Skip reports that are already saved
+                    continue
+
+                # Saving report file
+                data_source_url = base_url + link['href']
+                target_path = 'source_data/cycle_%s/%s' % (cycle_number, file_name)
+
+                r = requests.get(data_source_url)
+                open(target_path, 'wb').write(r.content)
+
+                # Saving headinfo to model Report
+                report = Report(
+                    package_number = package_number,
+                    date_code = file_name.split('_')[2].replace('.txt', ''),
+                    cycle = cycle_number
+                )
+                report.save()
+
 
             # Notes:
             # - If directory 'source_data' or 'cycle_*' does not exist -> create
