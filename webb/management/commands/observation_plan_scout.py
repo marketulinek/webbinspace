@@ -4,7 +4,23 @@ from webb.models import Report
 import requests
 
 
-# TODO: function that will send warning email and raise CommandError
+def check_multiple_cycles(element_list):
+    """Check the number of occurrences.
+
+    If given list contain only one value,
+    I expect that the cycle 1 is still in progress
+    and no action is needed.
+
+    If given list contain more values than 1,
+    perhaps that could mean cycle 2 has started.
+    The e-mail will be sent to inform that needs
+    to be done some changes in the code to adapt
+    the app. The command will be stopped.
+    """
+
+    if len(element_list) > 1:
+        # TODO: Send warning email
+        raise CommandError('Error: Multiple cycles are suspected. The element has appeared more times than expected.')
 
 class Command(BaseCommand):
     help = 'Scrape urls that contains report text files and downloads them to a predetermined folder.'
@@ -29,12 +45,7 @@ class Command(BaseCommand):
             if len(tablist) == 0:
                 raise CommandError('Error: Div with role=tablist not found.')
 
-            if len(tablist) > 1:
-                # Currently there is only one element with 'role=tablist',
-                # but I expected second one next year after the cycle 2 will start
-                print('Warning: more cycles?')
-                # TODO: Send warning email and stop the command
-                raise CommandError('Error: Manual check needed.')
+            check_multiple_cycles(tablist)
 
 
             # I. Scraping the title (cycle number)
@@ -43,12 +54,7 @@ class Command(BaseCommand):
             if len(title) == 0:
                 raise CommandError('Error: Title not found.')
 
-            if len(title) > 1:
-                # The same as 'tablist', I expect to find more titles after the cycle 2 will start
-                print('Warning: more cycles?')
-                # TODO: Send warning email and stop the command
-                raise CommandError('Error: Manual check needed.')
-
+            check_multiple_cycles(title)
             title_cycle = title[0].text.split(' ')
             cycle_number = title_cycle[1]
 
