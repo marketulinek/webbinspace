@@ -6,7 +6,6 @@ __pycache__/
 venv/
 
 # App stuff:
-source_data/
 
 # Django stuff:
 *.log
