@@ -1,9 +1,25 @@
 from django.core.management.base import BaseCommand
-from bs4 import BeautifulSoup
 from webb.models import Report
+from bs4 import BeautifulSoup
 import requests
 import re
+import os
 
+
+def save_report_file(cycle_number, file_name, content):
+    """
+    Save the report file to the source_data folder and a subfolder with a specific cycle number.
+    If the cycle folder does not exist it will be created.
+    """
+
+    folder = 'source_data/cycle_%s' % cycle_number
+    target_path = '%s/%s' % (folder, file_name)
+
+    if not os.path.exists(folder):
+        os.makedirs(folder, exist_ok=True)
+    
+    with open(target_path, 'wb') as writer:
+        writer.write(content)
 
 class Command(BaseCommand):
     help = 'Scrape urls that contains report text files and download them to a predetermined folder.'
@@ -43,10 +59,8 @@ class Command(BaseCommand):
 
                     # Save report file
                     data_source_url = base_url + link['href']
-                    target_path = 'source_data/cycle_%s/%s' % (cycle_number, file_name)
-
                     r = requests.get(data_source_url)
-                    open(target_path, 'wb').write(r.content)
+                    save_report_file(cycle_number, file_name, r.content)
 
                     # Save headinfo to model Report
                     report = Report(
@@ -56,6 +70,3 @@ class Command(BaseCommand):
                     )
                     report.save()
                     break # for dev purposes I use only one loop per run
-
-# TODO:
-# - If directory 'source_data' or 'cycle_*' does not exist -> create
