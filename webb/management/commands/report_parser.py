@@ -1,5 +1,14 @@
 from django.core.management.base import BaseCommand
+from django.db.models import Count
+from webb.models import Report
 
+
+def get_files_to_parse():
+    """
+    Looks into the Report table and selects all reports
+    that doesn't have visits yet and return them.
+    """
+    return Report.objects.annotate(num_visits=Count('visits')).filter(num_visits=0).order_by('date_code')
 
 def line_to_list(line, column_lengths):
 
@@ -36,31 +45,32 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         data = dict()
-        report_file = 'source_data/cycle_1/2222707f03_report_20220815.txt'
 
-        with open(report_file, 'r') as reader:
+        for report in get_files_to_parse():
 
-            lines = reader.readlines()
+            with open(report.get_path_to_file(), 'r') as reader:
 
-            package_number = lines[0].split(' ')[-1].strip()
-            column_lengths = get_column_lengths(lines[3])
-            column_names = line_to_list(lines[2], column_lengths)
+                lines = reader.readlines()
 
-            line_data = list()
-            for line_number, line in enumerate(lines):
+                package_number = lines[0].split(' ')[-1].strip()
+                column_lengths = get_column_lengths(lines[3])
+                column_names = line_to_list(lines[2], column_lengths)
 
-                if line_number > 3:
+                line_data = list()
+                for line_number, line in enumerate(lines):
 
-                    data_list = line_to_list(line, column_lengths)
+                    if line_number > 3:
 
-                    line_data.append(merge_lists_to_dict(column_names, data_list))
+                        data_list = line_to_list(line, column_lengths)
+                        line_data.append(merge_lists_to_dict(column_names, data_list))
 
-                if line_number >= 6:
-                    break # limited number lines for dev purposes
+                    if line_number >= 6:
+                        break # limited number lines for dev purposes
 
-            data[package_number] = line_data
+                data[package_number] = line_data
 
-        print(data)
+            print(data)
+            break # limited number loops for dev purposes
 
 # Expecting result
 {'2222707f03':
