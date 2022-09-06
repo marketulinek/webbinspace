@@ -3,16 +3,24 @@ from django.urls import reverse
 
 
 class Report(models.Model):
-    package_number = models.CharField(max_length=10)
+    package_number = models.CharField(max_length=10, unique=True)
     date_code = models.SmallIntegerField()
     cycle = models.SmallIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return '%s_report_%i' % (self.package_number, self.date_code)
+        return self.file_name
 
     def get_absolute_url(self):
         return reverse('report_detail', args=[self.date_code])
+
+    def get_path_to_file(self):
+        return 'source_data/cycle_%i/%s.txt' % (self.cycle, self.file_name)
+
+    @property
+    def file_name(self):
+        "Returns the string that corresponds to the file name in the source_data folder."
+        return '%s_report_%i' % (self.package_number, self.date_code)
 
 class Category(models.Model):
     name = models.CharField(max_length=30)
