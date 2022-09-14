@@ -23,7 +23,7 @@ class Report(models.Model):
         return '%s_report_%i' % (self.package_number, self.date_code)
 
 class Category(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=30, unique=True)
 
     class Meta:
         verbose_name_plural = 'categories'
@@ -47,18 +47,17 @@ class Visit(models.Model):
         on_delete=models.PROTECT,
         related_name='visits'
     )
-    visit_id = models.CharField(max_length=10, default='')
+    visit_id = models.CharField(max_length=10, null=True, unique=True)
     pcs_mode = models.CharField(max_length=10, default='')
     visit_type = models.CharField(max_length=30, default='')
     scheduled_start_time = models.DateTimeField(null=True)
-    duration = models.DateTimeField(null=True)
+    duration = models.DurationField(null=True)
     science_instrument_and_mode = models.CharField(max_length=50, default='')
     instrument = models.CharField(
         choices=INSTRUMENT_CHOICES,
         max_length=1,
-        default=''
+        null=True
     )
-    mode = models.CharField(max_length=50, default='')
     target_name = models.CharField(max_length=30, default='')
     category = models.ForeignKey(
         Category,
