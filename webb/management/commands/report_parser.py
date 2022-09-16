@@ -43,6 +43,9 @@ def merge_lists_to_dict(key_list, value_list):
 
 def add_category_if_not_exist(category_name):
 
+    if not category_name:
+        return None
+
     try:
         category = Category.objects.get(name=category_name)
 
@@ -52,7 +55,17 @@ def add_category_if_not_exist(category_name):
 
     return category
 
+def format_start_time(time):
+
+    if isinstance(time, dt.datetime):
+        return time
+    
+    return None
+
 def format_duration(duration):
+
+    if not duration:
+        return None
 
     days,time = duration.split('/')
     parts_of_time = time.split(':')
@@ -77,7 +90,7 @@ def save_data(report, data):
         visit_id = data['VISIT ID'],
         pcs_mode = data['PCS MODE'],
         visit_type = data['VISIT TYPE'],
-        scheduled_start_time = data['SCHEDULED START TIME'],
+        scheduled_start_time = format_start_time(data['SCHEDULED START TIME']),
         duration = format_duration(data['DURATION']),
         science_instrument_and_mode = data['SCIENCE INSTRUMENT AND MODE'],
         instrument = get_instrument_type(data['SCIENCE INSTRUMENT AND MODE']),
@@ -108,13 +121,12 @@ class Command(BaseCommand):
                         data_list = line_to_list(line, column_lengths)
                         data = merge_lists_to_dict(column_names, data_list)
 
-                        if len(data) > 0:
+                        if len(data) > 0 and data['VISIT ID']:
                             save_data(report, data)
-                            break
 
                     if line_number >= 6:
-                        break # limited number lines for dev purposes
-
+                        pass
+                        #break # limited number lines for dev purposes
 
             break # limited number loops for dev purposes
 
