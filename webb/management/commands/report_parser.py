@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.db.models import Count
+from django.db import IntegrityError
 from webb.models import Report, Visit, Category
 import datetime as dt
 
@@ -41,39 +42,33 @@ def merge_lists_to_dict(key_list, value_list):
 
     return new_dict
 
-def add_category_if_not_exist(category_name):
+def add_category_if_not_exists(category_name):
 
-    if not category_name:
-        return None
+    if category_name:
+        category, created = Category.objects.get_or_create(name=category_name)
+        return category
 
-    try:
-        category = Category.objects.get(name=category_name)
-
-    except Category.DoesNotExist:
-        category = Category(name=category_name)
-        category.save()
-
-    return category
+    return None
 
 def format_start_time(time):
 
-    if isinstance(time, dt.datetime):
+    try:
+        dt.datetime.strptime(time, "%Y-%m-%dT%H:%M:%SZ")
         return time
-    
-    return None
+    except ValueError:
+        return None
 
 def format_duration(duration):
 
-    if not duration:
-        return None
+    if duration:
+        days,time = duration.split('/')
+        parts_of_time = time.split(':')
+        h = int(parts_of_time[0])
+        m = int(parts_of_time[1])
+        s = int(parts_of_time[2])
+        return dt.timedelta(days=int(days), hours=h, minutes=m, seconds=s)
 
-    days,time = duration.split('/')
-    parts_of_time = time.split(':')
-    h = int(parts_of_time[0])
-    m = int(parts_of_time[1])
-    s = int(parts_of_time[2])
-
-    return dt.timedelta(days=int(days), hours=h, minutes=m, seconds=s)
+    return None
 
 def get_instrument_type(text):
 
@@ -95,7 +90,7 @@ def save_data(report, data):
         science_instrument_and_mode = data['SCIENCE INSTRUMENT AND MODE'],
         instrument = get_instrument_type(data['SCIENCE INSTRUMENT AND MODE']),
         target_name = data['TARGET NAME'],
-        category = add_category_if_not_exist(data['CATEGORY']),
+        category = add_category_if_not_exists(data['CATEGORY']),
         keywords = data['KEYWORDS'],
     )
     visit.save()
@@ -122,25 +117,10 @@ class Command(BaseCommand):
                         data = merge_lists_to_dict(column_names, data_list)
 
                         if len(data) > 0 and data['VISIT ID']:
-                            save_data(report, data)
 
-                    if line_number >= 6:
-                        pass
-                        #break # limited number lines for dev purposes
+                            try:
+                                save_data(report, data)
+                            except IntegrityError:
+                                continue
 
             break # limited number loops for dev purposes
-
-# Expecting result
-{'2222707f03':
-    {
-        'VISIT ID': '1304:4:1',
-        'PCS MODE': 'FINEGUIDE',
-        'VISIT TYPE': 'PRIME TARGETED FIXED',
-        'SCHEDULED START TIME': '2022-08-15T12:13:43Z',
-        'DURATION': '00/00:27:13',
-        'SCIENCE INSTRUMENT AND MODE': 'NIRCam Imaging',
-        'TARGET NAME': 'SCULPTOR-F0',
-        'CATEGORY': 'Galaxy',
-        'KEYWORDS': 'Dwarf spheroidal galaxies, Planetary nebulae, ...'
-    }
-}
