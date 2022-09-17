@@ -13,9 +13,13 @@ class ReportAdmin(admin.ModelAdmin):
     readonly_fields = ['created_at']
     list_filter = ['cycle']
 
+class VisitAdmin(admin.ModelAdmin):
+    model = Visit
+    list_display = ['visit_id', 'scheduled_start_time', 'duration', 'target_name', 'category']
+
 admin.site.unregister(Group)
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.register(Report, ReportAdmin)
 admin.site.register(Category)
-admin.site.register(Visit)
+admin.site.register(Visit, VisitAdmin)
