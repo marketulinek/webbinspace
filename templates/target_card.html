@@ -1,0 +1,28 @@
+<div class="col{% if status != 'current' %} d-none d-md-block{% endif %}">
+    <div class="card mb-4 rounded-3 shadow-sm">
+      <div class="card-header py-3">
+        <h4 class="my-0 fw-normal">
+            {% if status == 'current' %}
+                <div class="progress current-target-progress">
+                    <div class="progress-bar bg-warning" role="progressbar" aria-label="Animated striped example" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%"></div>
+                </div>
+            {% else %}
+                {{ status|title }}
+            {% endif %}
+        </h4>
+      </div>
+      <div class="card-body">
+        {% if status == 'current' %}
+            <h1 class="card-title">{{ target.target_name }}</h1>
+        {% else %}
+            <h2 class="card-title">{{ target.target_name }}</h2>
+        {% endif %}
+        
+        <h3><small class="text-muted fw-light">{{ target.category.name }}</small></h3>
+        <ul class="list-unstyled mt-3 mb-4">
+          <li>{{ target.keywords }}</li>
+        </ul>
+        <!--<button type="button" class="w-100 btn btn-lg btn-outline-warning">See detail</button>-->
+      </div>
+    </div>
+</div>

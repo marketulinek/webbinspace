@@ -52,41 +52,9 @@
                 <p class="fs-5 text-muted text-center">Webb is observing...</p>
 
               <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
-                {% for i in '123'|make_list %}
-                <div class="col{% if forloop.first or forloop.last %} d-none d-md-block{% endif %}">
-                    <div class="card mb-4 rounded-3 shadow-sm">
-                      <div class="card-header py-3">
-                        <h4 class="my-0 fw-normal">
-                            {% if forloop.first %}
-                                Previous
-                            {% elif forloop.last %}
-                                Next
-                            {% else %}
-                                <div class="progress current-target-progress">
-                                    <div class="progress-bar bg-warning" role="progressbar" aria-label="Animated striped example" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%"></div>
-                                </div>
-                            {% endif %}
-                        </h4>
-                      </div>
-                      <div class="card-body">
-                        {% if forloop.first or forloop.last %}
-                        <h2 class="card-title">Target Name</h2>
-                        {% else %}
-                        <h1 class="card-title">Target Name</h1>
-                        {% endif %}
-                        
-                        <h3><small class="text-muted fw-light">Category</small></h3>
-                        <ul class="list-unstyled mt-3 mb-4">
-                          <li>Keyword</li>
-                          <li>Keyword</li>
-                          <li>Keyword</li>
-                          <li>Keyword</li>
-                        </ul>
-                        <!--<button type="button" class="w-100 btn btn-lg btn-outline-warning">See detail</button>-->
-                      </div>
-                    </div>
-                  </div>
-                {% endfor %}
+                {% include "target_card.html" with target=prev_target status='previous' %}
+                {% include "target_card.html" with target=current_target status='current' %}
+                {% include "target_card.html" with target=next_target status='next' %}
               </div>
             </main>
           
