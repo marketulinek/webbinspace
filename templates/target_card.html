@@ -4,7 +4,7 @@
         <h4 class="my-0 fw-normal">
             {% if status == 'current' %}
                 <div class="progress current-target-progress">
-                    <div class="progress-bar bg-warning" role="progressbar" aria-label="Animated striped example" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%"></div>
+                    <div class="progress-bar bg-warning" role="progressbar" aria-label="Animated striped example" aria-valuenow="{{ current_target_progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ current_target_progress }}%"></div>
                 </div>
             {% else %}
                 {{ status|title }}
