@@ -7,42 +7,6 @@ h3, h4, h5, h6 { color: white; }
 h2, a { color: #CA6; }
 .card { background-color: inherit; }
 
-.hex {
-    margin-top: 30px;
-    width: 104px;
-    height: 60px;
-    background-color: #FFC107;
-    border-color: #FFC107;
-    position: relative;
-    display: inline-block;
-}
-.hex:before {
-    content: " ";
-    width: 0; height: 0;
-    border-bottom: 30px solid;
-    border-color: inherit;
-    border-left: 52px solid transparent;
-    border-right: 52px solid transparent;
-    position: absolute;
-    top: -30px;
-    left: 0;
-}
-.hex:after {
-    content: "";
-    width: 0;
-    position: absolute;
-    bottom: -30px;
-    left: 0px;
-    border-top: 30px solid;
-    border-color: inherit;
-    border-left: 52px solid transparent;
-    border-right: 52px solid transparent;
-}
-
-.bi-octagon-fill {
-    color: black;
-}
-
 .last-path {
     background-image: linear-gradient(45deg,#343a40 25%,black 25%,black 50%,#343a40 50%,#343a40 75%,black 75%,black);
 }
