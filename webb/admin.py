@@ -16,6 +16,7 @@ class ReportAdmin(admin.ModelAdmin):
 class VisitAdmin(admin.ModelAdmin):
     model = Visit
     list_display = ['visit_id', 'scheduled_start_time', 'duration', 'target_name', 'category']
+    search_fields = ['visit_id', 'report__package_number', 'target_name', 'category__name']
 
 admin.site.unregister(Group)
 admin.site.unregister(User)
