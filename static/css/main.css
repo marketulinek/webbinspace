@@ -7,14 +7,50 @@ h3, h4, h5, h6 { color: white; }
 h2, a { color: #CA6; }
 .card { background-color: inherit; }
 
-.last-path {
+.moving-path-wrapper { margin-top: -60px; }
+.moving-path {width: 40%;}
+.moving-path .progress {height: 1px;}
+.moving-path .progress-bar {
+    width: 100%;
     background-image: linear-gradient(45deg,#343a40 25%,black 25%,black 50%,#343a40 50%,#343a40 75%,black 75%,black);
 }
-.future-path {
-    background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,black 25%,black 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,black 75%,black);
-}
-
 .current-target-progress {
     height: 10px;
     background-color: #6c757d;
+}
+
+.marquee {
+    height: 100px;
+    width: 100%;
+    margin-bottom: -120px;
+    font-size: 18px;
+    overflow: hidden;
+    position: relative;
+    z-index: -1;
+}
+.marquee div {
+    display: block;
+    width: 200%;
+    height: 30px;
+    position: absolute;
+    overflow: hidden;
+    animation: marquee 100s linear infinite;
+}
+.marquee span {
+    float: left;
+    width: 50px;
+}
+.marquee .bottom-targets {
+    margin-top: 75px;
+}
+.marquee .top-targets span {
+    margin-right: 1000px;
+}
+.marquee .bottom-targets span {
+    margin-left: 500px;
+    margin-right: 500px;
+}
+@keyframes marquee {
+    0% { left: 0; }
+    100% { left: -100%; }
 }
