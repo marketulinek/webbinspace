@@ -1,14 +1,19 @@
 from django.core.management.base import BaseCommand
 from webb.models import Report
 from bs4 import BeautifulSoup
+from decouple import config
 import requests
 import re
 import os
 
 
+BASE_URL = 'https://www.stsci.edu'
+TARGET_URL = BASE_URL + '/jwst/science-execution/observing-schedules'
+
+
 def save_report_file(cycle_number, file_name, content):
     """
-    Save the report file to the source_data folder and a subfolder with a specific cycle number.
+    Saves the report file to the source_data folder and a subfolder with a specific cycle number.
     If the cycle folder does not exist it will be created.
     """
 
@@ -21,29 +26,38 @@ def save_report_file(cycle_number, file_name, content):
     with open(target_path, 'wb') as writer:
         writer.write(content)
 
+def get_site_content():
+    """
+    This function prevents scraping the real site during development purposes.
+
+    If the target site is saved locally and url to the file defined in the environment
+    file as LOCAL_TARGET_URL, the function returns content of the saved file.
+    Otherwise returns the content of the real target site.
+    """
+
+    local_target_url = config('LOCAL_TARGET_URL', default=None)
+
+    if local_target_url:
+        with open(local_target_url, 'r', encoding='utf-8') as f:
+            html = f.read()
+    else:
+        response = requests.get(TARGET_URL)
+        html = response.content
+
+    return BeautifulSoup(html, 'html.parser')
+
 class Command(BaseCommand):
-    help = 'Scrape urls that contains report text files and download them to a predetermined folder.'
+    help = 'Scrapes urls that contains report text files and downloads them to a predetermined folder.'
 
     def handle(self, *args, **options):
 
-        base_url = 'https://www.stsci.edu'
-        url = base_url + '/jwst/science-execution/observing-schedules'
-        response = requests.get(url)
-        soup = BeautifulSoup(response.content, 'html.parser')
-
-        # I download the page so I don't scrape it everytime during the development
-        #url = 'source_data/OBSERVING_SCHEDULES.htm'
-
-        #with open(url, 'r', encoding='utf-8') as f:
-            #html = f.read()
-            #soup = BeautifulSoup(html, 'html.parser')
-
-        cycle_headers = soup.find_all('button', {'aria-label':re.compile('Cycle [0-9]+')})
+        content = get_site_content()
+        cycle_headers = content.find_all('button', {'aria-label':re.compile('Cycle [0-9]+')})
 
         for head in cycle_headers:
 
             cycle_number = head['aria-label'].split(' ')[1]
-            cycle_body = soup.find('div', {'aria-labelledby': head['id']})
+            cycle_body = content.find('div', {'aria-labelledby': head['id']})
             links = cycle_body.find_all('a')
 
             saved_reports = Report.objects.filter(cycle=cycle_number).values_list('package_number', flat=True)
@@ -58,7 +72,7 @@ class Command(BaseCommand):
                     continue
 
                 # Save report file
-                data_source_url = base_url + link['href']
+                data_source_url = BASE_URL + link['href']
                 r = requests.get(data_source_url)
                 save_report_file(cycle_number, file_name, r.content)
 
@@ -69,4 +83,4 @@ class Command(BaseCommand):
                     cycle = cycle_number
                 )
                 report.save()
-                break # for dev purposes I use only one loop per run
+                break # for dev purposes I use only one loop per command
