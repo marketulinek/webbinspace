@@ -10,6 +10,8 @@ classDiagram
       created_at: DateTime
       __str__()
       get_absolute_url()
+      get_path_to_file()
+      file_name()
     }
     class Category{
       name: str
@@ -21,10 +23,9 @@ classDiagram
       pcs_mode: str
       visit_type: str
       scheduled_start_time: DateTime
-      duration: DateTime
+      duration: Duration
       science_instrument_and_mode: str
       instrument: tuple
-      mode: str
       target_name: str
       keywords: str
       __str__()
