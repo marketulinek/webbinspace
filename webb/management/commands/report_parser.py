@@ -3,6 +3,10 @@ from django.db.models import Count
 from django.db import IntegrityError
 from webb.models import Report, Visit, Category
 import datetime as dt
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_files_to_parse():
@@ -100,7 +104,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
+        logger.info('Report parser started to work.')
+
         for report in get_files_to_parse():
+
+            logger.info('Parsing the report: %s', report.file_name)
 
             with open(report.get_path_to_file(), 'r') as reader:
 
@@ -121,6 +129,9 @@ class Command(BaseCommand):
                             try:
                                 save_data(report, data)
                             except IntegrityError:
-                                continue
+                                logger.exception('This visit ID %s is already saved in the database.', data['VISIT ID'])
 
+            logger.info('Parsed.')
             break # limited number loops for dev purposes
+
+        logger.info('Report parser finished the work.')

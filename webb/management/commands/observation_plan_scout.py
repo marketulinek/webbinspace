@@ -3,12 +3,15 @@ from webb.models import Report
 from bs4 import BeautifulSoup
 from decouple import config
 import requests
+import logging
 import re
 import os
 
 
 BASE_URL = 'https://www.stsci.edu'
 TARGET_URL = BASE_URL + '/jwst/science-execution/observing-schedules'
+
+logger = logging.getLogger(__name__)
 
 
 def save_report_file(cycle_number, file_name, content):
@@ -51,6 +54,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
+        logger.info('Scout started to work.')
+
         content = get_site_content()
         cycle_headers = content.find_all('button', {'aria-label':re.compile('Cycle [0-9]+')})
 
@@ -71,10 +76,12 @@ class Command(BaseCommand):
                     # Skip reports that are already saved
                     continue
 
+                logger.info('Report file found: %s', file_name)
+
                 # Save report file
-                data_source_url = BASE_URL + link['href']
-                r = requests.get(data_source_url)
+                r = requests.get(BASE_URL + link['href'])
                 save_report_file(cycle_number, file_name, r.content)
+                logger.info('Report file saved.')
 
                 # Save headinfo to model Report
                 report = Report(
@@ -84,3 +91,5 @@ class Command(BaseCommand):
                 )
                 report.save()
                 break # for dev purposes I use only one loop per command
+
+        logger.info('Scout finished the work.')
