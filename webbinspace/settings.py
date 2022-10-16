@@ -148,22 +148,30 @@ LOGGING = {
     },
     'handlers': {
         'console': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
         'filelog': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': config('DJANGO_LOG_FILE', default='django.log'),
+            'level': 'INFO',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': config('DJANGO_LOG_FILE', default='logs/django.log'),
+            'when': 'midnight',
+            'interval': 1,
+            'backupCount': 30,
             'formatter': 'verbose'
         }
     },
     'loggers': {
         'django': {
-            'handlers': ['console', 'filelog'],
-            'level': config('DJANGO_LOG_LEVEL', default='INFO'),
+            'handlers': ['console'],
+            'level': config('DJANGO_LOG_LEVEL', default='WARNING'),
             'propagate': False,
+        },
+        'webb': {
+            'handlers': ['console', 'filelog'],
+            'level': config('WEBB_LOG_LEVEL', default='INFO'),
+            'propagate': True,
         }
     }
 }
