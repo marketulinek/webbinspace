@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.urls import reverse
 from .models import Report, Visit
 from .management.commands.report_parser import get_instrument_type,format_duration
 
@@ -7,7 +8,7 @@ class WebbTests(TestCase):
 
     def setUp(self):
         r = Report.objects.create(package_number='2219105f02', date_code='20220710', cycle=1)
-
+        
         Visit.objects.create(report=r, visit_id='2739:4:1', scheduled_start_time='2022-07-14T19:00:00Z', duration=format_duration('00/00:12:06'), target_name='Neptune', keywords='Planet')
         Visit.objects.create(report=r, visit_id='1022:9:5', scheduled_start_time='2022-07-15T19:00:00Z', duration=format_duration('00/00:12:06'), target_name='Jupiter', keywords='Planet')
 
@@ -15,6 +16,11 @@ class WebbTests(TestCase):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
 
+    def test_homepage(self):
+        response = self.client.get(reverse('homepage'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'home.html')
+        self.assertContains(response, 'Webb is observing..')
 
 class ReportParserTests(TestCase):
 
