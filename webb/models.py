@@ -66,6 +66,10 @@ class Visit(models.Model):
         null=True
     )
     keywords = models.CharField(max_length=100, default='')
+    valid = models.BooleanField(default=True)
 
     def __str__(self):
         return self.visit_id
+
+    def invalidate(self):
+        self.valid = False
