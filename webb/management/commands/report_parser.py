@@ -38,14 +38,6 @@ def get_column_lengths(line):
 
     return value_list
 
-def merge_lists_to_dict(key_list, value_list):
-
-    new_dict = dict()
-    for index, key in enumerate(key_list):
-        new_dict[key] = value_list[index]
-
-    return new_dict
-
 def add_category_if_not_exists(category_name):
 
     if category_name:
@@ -122,7 +114,7 @@ class Command(BaseCommand):
                     if line_number > 3:
 
                         data_list = line_to_list(line, column_lengths)
-                        data = merge_lists_to_dict(column_names, data_list)
+                        data = dict(zip(column_names, data_list))
 
                         if len(data) > 0 and data['VISIT ID']:
 
