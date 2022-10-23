@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.db.models import Count
 from django.db import IntegrityError
+from django.utils.dateparse import parse_datetime
 from webb.models import Report, Visit, Category
 import datetime as dt
 import logging
@@ -9,13 +10,41 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def get_files_to_parse():
+def get_reports_to_parse():
     """
     It searches for reports that don't have visits in the database yet.
+
     These reports were saved in specific folder by Scout and are still
     waiting to be parsed and their information saved into database.
     """
-    return Report.objects.annotate(num_visits=Count('visits')).filter(num_visits=0).order_by('date_code')
+    reports_to_parse = Report.objects.annotate(num_visits=Count('visits')).filter(num_visits=0).order_by('date_code')
+
+    if len(reports_to_parse) < 1:
+        logger.info('No reports to parse.')
+
+    return reports_to_parse
+
+def get_type_of_report(scheduled_start_time):
+
+    if format_start_time(scheduled_start_time) is None:
+        return None
+
+    latest_visit = Visit.objects.filter(scheduled_start_time__isnull=False).order_by('-scheduled_start_time').first()
+
+    if latest_visit is None:
+        return None
+
+    if parse_datetime(scheduled_start_time) > latest_visit.scheduled_start_time:
+        return 'new'
+
+    return 'update'
+
+def invalidate_visits_from_datetime(start_time):
+    """
+    These visits are no longer valid because next report brings updates to the schedule.
+    """
+    start_time = format_start_time(start_time)
+    return Visit.objects.filter(scheduled_start_time__gte=start_time,valid=True).update(valid=False)
 
 def line_to_list(line, column_lengths):
 
@@ -91,6 +120,21 @@ def save_data(report, data):
     )
     visit.save()
 
+def update_data(report, data):
+
+    visit = Visit.objects.get(visit_id=data['VISIT ID'])
+    visit.report = report
+    visit.pcs_mode = data['PCS MODE']
+    visit.visit_type = data['VISIT TYPE']
+    visit.scheduled_start_time = format_start_time(data['SCHEDULED START TIME'])
+    visit.duration = format_duration(data['DURATION'])
+    visit.science_instrument_and_mode = data['SCIENCE INSTRUMENT AND MODE']
+    visit.instrument = get_instrument_type(data['SCIENCE INSTRUMENT AND MODE'])
+    visit.target_name = data['TARGET NAME']
+    visit.category = add_category_if_not_exists(data['CATEGORY'])
+    visit.keywords = data['KEYWORDS']
+    visit.save()
+
 class Command(BaseCommand):
     help = 'Parse chosen report file and save data into database.'
 
@@ -98,7 +142,7 @@ class Command(BaseCommand):
 
         logger.info('Report parser started to work.')
 
-        for report in get_files_to_parse():
+        for report in get_reports_to_parse():
 
             logger.info('Parsing the report: %s', report.file_name)
 
@@ -106,6 +150,7 @@ class Command(BaseCommand):
 
                 lines = reader.readlines()
 
+                report_type = None
                 column_lengths = get_column_lengths(lines[3])
                 column_names = line_to_list(lines[2], column_lengths)
 
@@ -118,10 +163,27 @@ class Command(BaseCommand):
 
                         if len(data) > 0 and data['VISIT ID']:
 
+                            if report_type is None:
+                                report_type = get_type_of_report(data['SCHEDULED START TIME'])
+
+                                if report_type == 'update':
+                                    logger.info('This report file contains updates of the last report.')
+                                    
+                                    num_row_updated = invalidate_visits_from_datetime(data['SCHEDULED START TIME'])
+                                    logger.info('%i row(s) has been invalidated.', num_row_updated)
+
                             try:
                                 save_data(report, data)
                             except IntegrityError:
-                                logger.exception('This visit ID %s is already saved in the database.', data['VISIT ID'])
+
+                                if report_type == 'update':
+                                    update_data(report, data)
+                                    logger.info('Visit with ID %s was updated.', data['VISIT ID'])
+                                else:
+                                    logger.exception(
+                                        'This visit ID %s is already saved in the database.',
+                                        data['VISIT ID']
+                                    )
 
             logger.info('Parsed.')
             break # limited number loops for dev purposes
