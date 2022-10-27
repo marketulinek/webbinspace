@@ -26,15 +26,16 @@ def get_reports_to_parse():
 
 def get_type_of_report(scheduled_start_time):
 
-    if format_start_time(scheduled_start_time) is None:
+    scheduled_start_time = parse_datetime(scheduled_start_time)
+
+    if scheduled_start_time is None:
         return None
 
     latest_visit = Visit.objects.filter(scheduled_start_time__isnull=False).order_by('-scheduled_start_time').first()
-
     if latest_visit is None:
         return None
 
-    if parse_datetime(scheduled_start_time) > latest_visit.scheduled_start_time:
+    if scheduled_start_time > latest_visit.scheduled_start_time:
         return 'new'
 
     return 'update'
@@ -43,7 +44,7 @@ def invalidate_visits_from_datetime(start_time):
     """
     These visits are no longer valid because next report brings updates to the schedule.
     """
-    start_time = format_start_time(start_time)
+    start_time = parse_datetime(start_time)
     return Visit.objects.filter(scheduled_start_time__gte=start_time,valid=True).update(valid=False)
 
 def line_to_list(line, column_lengths):
@@ -75,14 +76,6 @@ def add_category_if_not_exists(category_name):
 
     return None
 
-def format_start_time(time):
-
-    try:
-        dt.datetime.strptime(time, "%Y-%m-%dT%H:%M:%SZ")
-        return time
-    except ValueError:
-        return None
-
 def format_duration(duration):
 
     if duration:
@@ -110,7 +103,7 @@ def save_data(report, data):
         visit_id = data['VISIT ID'],
         pcs_mode = data['PCS MODE'],
         visit_type = data['VISIT TYPE'],
-        scheduled_start_time = format_start_time(data['SCHEDULED START TIME']),
+        scheduled_start_time = parse_datetime(data['SCHEDULED START TIME']),
         duration = format_duration(data['DURATION']),
         science_instrument_and_mode = data['SCIENCE INSTRUMENT AND MODE'],
         instrument = get_instrument_type(data['SCIENCE INSTRUMENT AND MODE']),
@@ -126,7 +119,7 @@ def update_data(report, data):
     visit.report = report
     visit.pcs_mode = data['PCS MODE']
     visit.visit_type = data['VISIT TYPE']
-    visit.scheduled_start_time = format_start_time(data['SCHEDULED START TIME'])
+    visit.scheduled_start_time = parse_datetime(data['SCHEDULED START TIME'])
     visit.duration = format_duration(data['DURATION'])
     visit.science_instrument_and_mode = data['SCIENCE INSTRUMENT AND MODE']
     visit.instrument = get_instrument_type(data['SCIENCE INSTRUMENT AND MODE'])
