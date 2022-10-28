@@ -71,7 +71,7 @@ def get_column_lengths(line):
 def add_category_if_not_exists(category_name):
 
     if category_name:
-        category, created = Category.objects.get_or_create(name=category_name)
+        category, _ = Category.objects.get_or_create(name=category_name)
         return category
 
     return None
@@ -98,35 +98,23 @@ def get_instrument_type(text):
 
 def save_data(report, data):
 
-    visit = Visit(
-        report = report,
-        visit_id = data['VISIT ID'],
-        pcs_mode = data['PCS MODE'],
-        visit_type = data['VISIT TYPE'],
-        scheduled_start_time = parse_datetime(data['SCHEDULED START TIME']),
-        duration = format_duration(data['DURATION']),
-        science_instrument_and_mode = data['SCIENCE INSTRUMENT AND MODE'],
-        instrument = get_instrument_type(data['SCIENCE INSTRUMENT AND MODE']),
-        target_name = data['TARGET NAME'],
-        category = add_category_if_not_exists(data['CATEGORY']),
-        keywords = data['KEYWORDS'],
+    Visit.objects.update_or_create(
+        visit_id=data['VISIT ID'],
+        defaults={
+            'report': report,
+            'visit_id': data['VISIT ID'],
+            'pcs_mode': data['PCS MODE'],
+            'visit_type': data['VISIT TYPE'],
+            'scheduled_start_time': parse_datetime(data['SCHEDULED START TIME']),
+            'duration': format_duration(data['DURATION']),
+            'science_instrument_and_mode': data['SCIENCE INSTRUMENT AND MODE'],
+            'instrument': get_instrument_type(data['SCIENCE INSTRUMENT AND MODE']),
+            'target_name': data['TARGET NAME'],
+            'category': add_category_if_not_exists(data['CATEGORY']),
+            'keywords': data['KEYWORDS'],
+            'valid': True,
+        }
     )
-    visit.save()
-
-def update_data(report, data):
-
-    visit = Visit.objects.get(visit_id=data['VISIT ID'])
-    visit.report = report
-    visit.pcs_mode = data['PCS MODE']
-    visit.visit_type = data['VISIT TYPE']
-    visit.scheduled_start_time = parse_datetime(data['SCHEDULED START TIME'])
-    visit.duration = format_duration(data['DURATION'])
-    visit.science_instrument_and_mode = data['SCIENCE INSTRUMENT AND MODE']
-    visit.instrument = get_instrument_type(data['SCIENCE INSTRUMENT AND MODE'])
-    visit.target_name = data['TARGET NAME']
-    visit.category = add_category_if_not_exists(data['CATEGORY'])
-    visit.keywords = data['KEYWORDS']
-    visit.save()
 
 class Command(BaseCommand):
     help = 'Parse chosen report file and save data into database.'
@@ -161,22 +149,10 @@ class Command(BaseCommand):
 
                                 if report_type == 'update':
                                     logger.info('This report file contains updates of the last report.')
-                                    
                                     num_row_updated = invalidate_visits_from_datetime(data['SCHEDULED START TIME'])
                                     logger.info('%i row(s) has been invalidated.', num_row_updated)
 
-                            try:
-                                save_data(report, data)
-                            except IntegrityError:
-
-                                if report_type == 'update':
-                                    update_data(report, data)
-                                    logger.info('Visit with ID %s was updated.', data['VISIT ID'])
-                                else:
-                                    logger.exception(
-                                        'This visit ID %s is already saved in the database.',
-                                        data['VISIT ID']
-                                    )
+                            save_data(report, data)
 
             logger.info('Parsed.')
             break # limited number loops for dev purposes
