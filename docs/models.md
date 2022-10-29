@@ -28,6 +28,7 @@ classDiagram
       instrument: tuple
       target_name: str
       keywords: str
+      valid: bool
       __str__()
     }
     Report "1" *-- "*" Visit

@@ -16,7 +16,8 @@ logger = logging.getLogger(__name__)
 
 def save_report_file(cycle_number, file_name, content):
     """
-    Saves the report file to the source_data folder and a subfolder with a specific cycle number.
+    Saves the report file to the source_data folder and a subfolder
+    with a specific cycle number.
     If the cycle folder does not exist it will be created.
     """
 
@@ -90,6 +91,5 @@ class Command(BaseCommand):
                     cycle = cycle_number
                 )
                 report.save()
-                break # for dev purposes I use only one loop per command
 
         logger.info('Scout finished the work.')
