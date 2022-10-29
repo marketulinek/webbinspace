@@ -140,7 +140,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '[%(asctime)s] %(levelname)s:%(name)s: %(message)s in %(filename)s on %(lineno)s',
+            'format': '[%(asctime)s] %(levelname)s: %(name)s: %(message)s in %(filename)s on %(lineno)s',
         },
         'simple': {
             'format': '%(levelname)s %(message)s',

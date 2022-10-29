@@ -6,10 +6,15 @@ from .utils import get_observing_progress
 
 def homepage(request):
 
-    prev_current_target = Visit.objects.filter(scheduled_start_time__lte=timezone.now(),valid=True).order_by('-scheduled_start_time')[:2]
+    prev_current_target = Visit.objects.filter(
+        scheduled_start_time__lte=timezone.now(),
+        valid=True).order_by('-scheduled_start_time')[:2]
     prev_target = prev_current_target[1]
     current_target = prev_current_target[0]
-    next_target = Visit.objects.filter(scheduled_start_time__gte=timezone.now(),valid=True).order_by('scheduled_start_time')[:1]
+
+    next_target = Visit.objects.filter(
+        scheduled_start_time__gte=timezone.now(),
+        valid=True).order_by('scheduled_start_time').first()
 
     current_target_progress = get_observing_progress(
         current_target.scheduled_start_time,

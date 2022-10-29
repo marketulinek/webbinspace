@@ -17,7 +17,8 @@ def get_reports_to_parse():
     These reports were saved in specific folder by Scout and are still
     waiting to be parsed and their information saved into database.
     """
-    reports_to_parse = Report.objects.annotate(num_visits=Count('visits')).filter(num_visits=0).order_by('date_code')
+    reports_to_parse = Report.objects.annotate(
+        num_visits=Count('visits')).filter(num_visits=0).order_by('date_code','created_at')
 
     if len(reports_to_parse) < 1:
         logger.info('No reports to parse.')
@@ -31,7 +32,8 @@ def get_type_of_report(scheduled_start_time):
     if scheduled_start_time is None:
         return None
 
-    latest_visit = Visit.objects.filter(scheduled_start_time__isnull=False).order_by('-scheduled_start_time').first()
+    latest_visit = Visit.objects.filter(
+        scheduled_start_time__isnull=False).order_by('-scheduled_start_time').first()
     if latest_visit is None:
         return None
 
@@ -149,7 +151,8 @@ class Command(BaseCommand):
 
                                 if report_type == 'update':
                                     logger.info('This report file contains updates of the last report.')
-                                    num_row_updated = invalidate_visits_from_datetime(data['SCHEDULED START TIME'])
+                                    num_row_updated = invalidate_visits_from_datetime(
+                                        data['SCHEDULED START TIME'])
                                     logger.info('%i row(s) has been invalidated.', num_row_updated)
 
                             save_data(report, data)
