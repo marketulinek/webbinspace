@@ -1,13 +1,15 @@
-> This is my personal project I am developing while exploring Django and scraping in Python 🔭
+> My personal project I am developing while exploring Django and scraping in Python 🔭
 
 # Webb In Space
 
 It's showing what the Webb telescope is observing right now.
 
-### The application is divided into small parts:
+![Screenshot of Webb In Space App](docs/screenshot.png "WebbInSpace")
+
+### The application is divided into three small parts:
 
 **Scraping the data:**
-- It scrapes [this page](https://www.stsci.edu/jwst/science-execution/observing-schedules) looking for the new reports and saved them into */data_source/cycle_{number}/* folder as new .txt file.
+- It scrapes [this page](https://www.stsci.edu/jwst/science-execution/observing-schedules) looking for new reports and saved them into */data_source/cycle_{number}/* folder as new txt file.
 - Use command: `python manage.py observation_plan_scout`.
 
 **Parsing the data:**
