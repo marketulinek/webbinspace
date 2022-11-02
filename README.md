@@ -6,7 +6,7 @@ It's showing what the Webb telescope is observing right now.
 
 ![Screenshot of Webb In Space App](docs/screenshot.png "WebbInSpace")
 
-### The application is divided into three small parts:
+### The application is divided into three parts:
 
 **Scraping the data:**
 - It scrapes [this page](https://www.stsci.edu/jwst/science-execution/observing-schedules) looking for new reports and saved them into */data_source/cycle_{number}/* folder as new txt file.
@@ -18,6 +18,13 @@ It's showing what the Webb telescope is observing right now.
 
 **Showing the data on the web page:**
 - Homepage shows what is the current target of the Webb's observation.
+
+## How to install
+:snake: Python 3.9 required
+
+- Install the dependencies: `pip install -r requirements.txt`
+- Apply migrations: `python manage.py migrate`
+- Run the app: `python manage.py runserver`
 
 ## Built With
 * [Django](https://www.djangoproject.com/) - Python web framework
