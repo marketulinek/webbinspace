@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand
 from django.db.models import Count
-from django.db import IntegrityError
 from django.utils.dateparse import parse_datetime
 from webb.models import Report, Visit, Category
 import datetime as dt
@@ -158,6 +157,5 @@ class Command(BaseCommand):
                             save_data(report, data)
 
             logger.info('Parsed.')
-            break # limited number loops for dev purposes
 
         logger.info('Report parser finished the work.')

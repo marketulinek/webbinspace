@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="text-center">
+        <h1>Hello Space!</h1>
+        <br>
+        <p class="lead">
+            You are seeing this page because there is no data in Visit model.
+        </p>
+        <p class="lead">
+            To fill it run command <kbd>python manage.py observation_plan_scout</kbd> in your terminal.
+            It will download reports.
+        </p>
+        <p class="lead">
+            Then run command <kbd>python manage.py report_parser</kbd> to parse and save data into model.
+        </p>
+    </div>
+{% endblock %}

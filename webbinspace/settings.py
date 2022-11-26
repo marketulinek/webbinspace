@@ -112,6 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
+# https://www.utctime.net/z-time-now
 TIME_ZONE = 'UTC'
 
 USE_I18N = True

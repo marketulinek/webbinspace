@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils import timezone
 from .models import Visit
 from .utils import get_observing_progress
@@ -9,6 +9,10 @@ def homepage(request):
     prev_current_target = Visit.objects.filter(
         scheduled_start_time__lte=timezone.now(),
         valid=True).order_by('-scheduled_start_time')[:2]
+
+    if len(prev_current_target) < 2:
+        return redirect('welcome')
+
     prev_target = prev_current_target[1]
     current_target = prev_current_target[0]
 
@@ -29,3 +33,7 @@ def homepage(request):
     }
 
     return render(request, 'home.html', context)
+
+
+def welcome_new_contributor(request):
+    return render(request, 'welcome_contributor.html')
