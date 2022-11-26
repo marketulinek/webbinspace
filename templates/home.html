@@ -2,7 +2,6 @@
 {% load static %}
 
 {% block content %}
-  <main>
     <div class="webb-path p-3 pb-md-4 mx-auto text-center">
 
       <div class="marquee">
@@ -41,5 +40,4 @@
       {% include "target_card.html" with target=current_target status='current' %}
       {% include "target_card.html" with target=next_target status='next' %}
     </div>
-  </main>
 {% endblock %}
