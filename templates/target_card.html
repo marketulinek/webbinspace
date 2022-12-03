@@ -1,4 +1,9 @@
-<div class="col{% if status != 'current' %} d-none d-md-block{% endif %}">
+<div class="col order-md-{{ order }}">
+
+    {% if status != 'current' %}
+      <hr class="d-block d-md-none">
+    {% endif %}
+
     <div class="card mb-4 rounded-3 shadow-sm">
       <div class="card-header py-3">
         <h4 class="my-0 fw-normal">

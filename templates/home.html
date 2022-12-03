@@ -36,8 +36,8 @@
     <p class="fs-5 text-muted text-center">Webb is observing..</p>
 
     <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
-      {% include "target_card.html" with target=prev_target status='previous' %}
-      {% include "target_card.html" with target=current_target status='current' %}
-      {% include "target_card.html" with target=next_target status='next' %}
+      {% include "target_card.html" with target=current_target status='current' order='2' %}
+      {% include "target_card.html" with target=prev_target status='previous' order='1' %}
+      {% include "target_card.html" with target=next_target status='next' order='3' %}
     </div>
 {% endblock %}
