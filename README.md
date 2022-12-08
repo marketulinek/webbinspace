@@ -1,5 +1,4 @@
 > My personal project I am developing while exploring Django and scraping in Python 🔭
-> You can visit demo on [pythonanywhere](https://marketah.pythonanywhere.com/).
 
 # Webb In Space
 
@@ -25,6 +24,13 @@ It's showing what the Webb telescope is observing right now.
 
 - Install the dependencies: `pip install -r requirements.txt`
 - Apply migrations: `python manage.py migrate`
+- Create your `.env` file:
+```
+# Example for development
+DEBUG=True
+DEVELOPMENT_MODE=True
+ALLOWED_HOSTS=127.0.0.1,localhost
+```
 - Run the app: `python manage.py runserver`
 
 ## Built With
