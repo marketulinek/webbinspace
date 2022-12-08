@@ -17,7 +17,7 @@ SECRET_KEY = config('SECRET_KEY', default=get_random_secret_key())
 
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost').split(',')
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='webbinspace.cz,www.webbinspace.cz,127.0.0.1').split(',')
 
 DEVELOPMENT_MODE = config('DEVELOPMENT_MODE', default=False, cast=bool)
 
@@ -71,8 +71,9 @@ WSGI_APPLICATION = 'webbinspace.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASE_URL = config('DATABASE_URL', default=None)
+USE_SQLITE = config('USE_SQLITE', default=True, cast=bool)
 
-if DEVELOPMENT_MODE:
+if DEVELOPMENT_MODE or USE_SQLITE:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',

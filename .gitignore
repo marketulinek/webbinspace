@@ -1,11 +1,12 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 
+# PyCharm
+.idea/
+
 # Environments
 .env
 venv/
-
-# App stuff:
 
 # Django stuff:
 *.log
@@ -16,5 +17,6 @@ db.sqlite3
 db.sqlite3-journal
 media
 
-# PyCharm
-.idea/
+# App stuff:
+Rostifile
+.rosti.state
