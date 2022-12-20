@@ -31,6 +31,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Ext apps
+    'django_tables2',
+
     # My apps
     'webb.apps.WebbConfig',
 ]
@@ -133,6 +137,10 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# https://django-tables2.readthedocs.io/en/latest/index.html
+DJANGO_TABLES2_TEMPLATE = "django_tables2/bootstrap4.html"
 
 
 # Logging
