@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 from .models import Visit
 from .utils import get_observing_progress
+from django_tables2 import SingleTableView
+import webb.tables as tables
 
 
 def homepage(request):
@@ -37,3 +39,9 @@ def homepage(request):
 
 def welcome_new_contributor(request):
     return render(request, 'welcome_contributor.html')
+
+
+class ObservingScheduleListView(SingleTableView):
+    model = Visit
+    table_class = tables.ObservingScheduleTable
+    template_name = 'observing_schedules.html'

@@ -19,8 +19,9 @@ class Report(models.Model):
 
     @property
     def file_name(self):
-        "Returns the string that corresponds to the file name in the source_data folder."
+        """Returns the string that corresponds to the file name in the source_data folder."""
         return '%s_report_%i' % (self.package_number, self.date_code)
+
 
 class Category(models.Model):
     name = models.CharField(max_length=30, unique=True)
@@ -33,6 +34,7 @@ class Category(models.Model):
 
     def get_absolute_url(self):
         return reverse('category_detail', args=[self.name])
+
 
 class Visit(models.Model):
     INSTRUMENT_CHOICES = (
