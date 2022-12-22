@@ -1,3 +1,6 @@
+/* -------------- */
+/* BASIC ELEMENTS */
+/* -------------- */
 body {
     background-color: black;
     color: #AAA;
@@ -5,8 +8,36 @@ body {
 h1, .title { color: #FFC107; }
 h3, h4, h5, h6 { color: white; }
 h2, a, kbd { color: #CA6; }
-.card { background-color: inherit; }
+a:hover { color: #B39559; }
 
+
+/* ----------------- */
+/*  (DJANGO) TABLES  */
+/* ----------------- */
+.table {
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+.page-link {
+    background-color: transparent;
+    border-color: rgb(55, 59, 62);
+    color: #6c757d;
+}
+.page-link:hover {
+    background-color: #CA6;
+    border-color: #CA6;
+    color: black;
+}
+.page-item.active .page-link {
+    background-color: #FFC107;
+    border-color: #CA6;
+    color: black;
+}
+
+
+/* --------------- */
+/*    WEBB PATH    */
+/* --------------- */
 .moving-path-wrapper { margin-top: -60px; }
 .moving-path {width: 40%;}
 .moving-path .progress {height: 1px;}
@@ -18,7 +49,12 @@ h2, a, kbd { color: #CA6; }
     height: 10px;
     background-color: #6c757d;
 }
+.card { background-color: inherit; }
 
+
+/* ------------- */
+/*    MARQUEE    */
+/* ------------- */
 .marquee {
     height: 100px;
     width: 100%;
