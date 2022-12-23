@@ -44,4 +44,9 @@ def welcome_new_contributor(request):
 class ObservingScheduleListView(SingleTableView):
     model = Visit
     table_class = tables.ObservingScheduleTable
-    template_name = 'observing_schedules.html'
+    template_name = 'observation_schedule.html'
+
+    def get_table_data(self):
+        return Visit.objects.filter(
+            scheduled_start_time__isnull=False,
+            valid=True).order_by('-scheduled_start_time')
