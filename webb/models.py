@@ -1,5 +1,7 @@
 from django.db import models
 from django.urls import reverse
+from django.utils import timezone
+from .utils import calculate_time_progress
 
 
 class Report(models.Model):
@@ -75,3 +77,9 @@ class Visit(models.Model):
 
     def invalidate(self):
         self.valid = False
+
+    @property
+    def is_underway(self):
+        """Returns info if the visit (target) is currently being observed or not."""
+        return self.scheduled_start_time <= timezone.now() \
+               and calculate_time_progress(self.scheduled_start_time, self.duration) < 100

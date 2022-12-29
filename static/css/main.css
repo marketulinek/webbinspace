@@ -33,6 +33,9 @@ a:hover { color: #B39559; }
     border-color: #CA6;
     color: black;
 }
+.underway {
+    border: 2px solid rgba(255, 193, 7, 0.8)
+}
 
 
 /* --------------- */
