@@ -34,6 +34,7 @@ INSTALLED_APPS = [
 
     # Ext apps
     'django_tables2',
+    'django_filters',
 
     # My apps
     'webb.apps.WebbConfig',
