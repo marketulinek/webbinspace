@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 from .models import Visit
 from .utils import get_observing_progress
-from django_tables2 import SingleTableView
+from .filters import VisitFilter
+from django_filters.views import FilterView
+from django_tables2.views import SingleTableMixin
 import webb.tables as tables
 
 
@@ -41,12 +43,13 @@ def welcome_new_contributor(request):
     return render(request, 'welcome_contributor.html')
 
 
-class ObservingScheduleListView(SingleTableView):
+class ObservingScheduleListView(SingleTableMixin, FilterView):
     model = Visit
     table_class = tables.ObservingScheduleTable
     template_name = 'observation_schedule.html'
+    filterset_class = VisitFilter
 
-    def get_table_data(self):
+    def get_queryset(self):
         return Visit.objects.filter(
             scheduled_start_time__isnull=False,
             valid=True).order_by('-scheduled_start_time')

@@ -3,5 +3,11 @@
 
 {% block content %}
     <h1>Observing Schedules</h1>
+    {% if filter %}
+        <form method="get" class="form form-inline">
+            {{ filter.form.as_p }}
+            <input type="submit" value="Filter" />
+        </form>
+    {% endif %}
     {% render_table table %}
 {% endblock %}
