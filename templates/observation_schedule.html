@@ -1,13 +1,9 @@
 {% extends 'base.html' %}
 {% load render_table from django_tables2 %}
+{% load crispy_forms_tags %}
 
 {% block content %}
     <h1>Observing Schedules</h1>
-    {% if filter %}
-        <form method="get" class="form form-inline">
-            {{ filter.form.as_p }}
-            <input type="submit" value="Filter" />
-        </form>
-    {% endif %}
+    {% crispy filter.form %}
     {% render_table table %}
 {% endblock %}

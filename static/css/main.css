@@ -10,6 +10,17 @@ h3, h4, h5, h6 { color: white; }
 h2, a, kbd { color: #CA6; }
 a:hover { color: #B39559; }
 
+.btn-outline-webb {
+    background-color: black;
+    color: #FFC107;
+    border-color: #FFC107;
+}
+.btn-outline-webb:hover {
+    background-color: #FFC107;
+    color: black;
+    border-color: black;
+}
+
 
 /* ----------------- */
 /*  (DJANGO) TABLES  */
