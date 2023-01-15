@@ -1,8 +1,9 @@
 from django.urls import path
-from .views import homepage, welcome_new_contributor
+import webb.views as views
 
 
 urlpatterns = [
-    path('', homepage, name='homepage'),
-    path('welcome/', welcome_new_contributor, name='welcome'),
+    path('', views.homepage, name='homepage'),
+    path('welcome/', views.welcome_new_contributor, name='welcome'),
+    path('observing-schedules/', views.ObservingScheduleListView.as_view(), name='observing_schedules')
 ]

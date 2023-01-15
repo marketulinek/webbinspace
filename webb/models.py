@@ -1,5 +1,7 @@
 from django.db import models
 from django.urls import reverse
+from django.utils import timezone
+from .utils import calculate_time_progress
 
 
 class Report(models.Model):
@@ -19,8 +21,9 @@ class Report(models.Model):
 
     @property
     def file_name(self):
-        "Returns the string that corresponds to the file name in the source_data folder."
+        """Returns the string that corresponds to the file name in the source_data folder."""
         return '%s_report_%i' % (self.package_number, self.date_code)
+
 
 class Category(models.Model):
     name = models.CharField(max_length=30, unique=True)
@@ -33,6 +36,7 @@ class Category(models.Model):
 
     def get_absolute_url(self):
         return reverse('category_detail', args=[self.name])
+
 
 class Visit(models.Model):
     INSTRUMENT_CHOICES = (
@@ -73,3 +77,9 @@ class Visit(models.Model):
 
     def invalidate(self):
         self.valid = False
+
+    @property
+    def is_underway(self):
+        """Returns info if the visit (target) is currently being observed or not."""
+        return self.scheduled_start_time <= timezone.now() \
+               and calculate_time_progress(self.scheduled_start_time, self.duration) < 100
