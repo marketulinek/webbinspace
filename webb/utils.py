@@ -30,3 +30,7 @@ def calculate_time_progress(start_time, duration):
     ts_now = int(round(dt.datetime.now().timestamp()))
 
     return (ts_now - ts_start) * (100 / ts_duration)
+
+
+def convert_duration_to_days(duration):
+    return duration.total_seconds() / 60 / 60 / 24
