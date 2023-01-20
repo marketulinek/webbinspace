@@ -27,12 +27,23 @@
           label: 'The time spent in days',
           data: [{%for duration in category_durations %}'{{ duration }}',{% endfor %}],
           borderWidth: 1,
-          backgroundColor: 'rgba(255, 193, 7, 0.2)',
+          backgroundColor: 'rgba(255, 193, 7, 0.1)',
           borderColor: 'rgba(255, 193, 7, 1)'
         }]
       },
       options: {
-        indexAxis: 'y'
+        indexAxis: 'y',
+        plugins: {
+          tooltip: {
+            displayColors: false,
+            callbacks: {
+              label: function(context) {
+                const categoryList = [{%for category in categories %}'{{ category.total_duration }}',{% endfor %}];
+                return categoryList[context.dataIndex];
+              }
+            }
+          }
+        }
       }
     });
   </script>
