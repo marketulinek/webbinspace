@@ -1,7 +1,8 @@
+from django.db.models import Sum
 from django.shortcuts import render, redirect
 from django.utils import timezone
-from .models import Visit
-from .utils import get_observing_progress
+from .models import Visit, Category
+from .utils import get_observing_progress, convert_duration_to_days
 from .filters import VisitFilter
 from django_filters.views import FilterView
 from django_tables2.views import SingleTableMixin
@@ -41,6 +42,26 @@ def homepage(request):
 
 def welcome_new_contributor(request):
     return render(request, 'welcome_contributor.html')
+
+
+def chart_of_observations(request):
+
+    categories = Category.objects.exclude(
+        name='Unidentified'
+    ).annotate(total_duration=Sum('visits__duration'))
+    category_durations = []
+
+    for category in categories:
+        category_durations.append(
+            convert_duration_to_days(category.total_duration)
+        )
+
+    context = {
+        'categories': categories,
+        'category_durations': category_durations
+    }
+
+    return render(request, 'chart_of_observations.html', context)
 
 
 class ObservingScheduleListView(SingleTableMixin, FilterView):
