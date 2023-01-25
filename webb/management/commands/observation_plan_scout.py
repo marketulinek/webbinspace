@@ -26,9 +26,10 @@ def save_report_file(cycle_number, file_name, content):
 
     if not os.path.exists(folder):
         os.makedirs(folder, exist_ok=True)
-    
+
     with open(target_path, 'wb') as writer:
         writer.write(content)
+
 
 def get_site_content():
     """
@@ -36,7 +37,7 @@ def get_site_content():
 
     If the target site is saved locally and url to the file defined in the environment
     file as LOCAL_TARGET_URL, the function returns content of the saved file.
-    Otherwise returns the content of the real target site.
+    Otherwise, returns the content of the real target site.
     """
 
     local_target_url = config('LOCAL_TARGET_URL', default=None)
@@ -50,15 +51,19 @@ def get_site_content():
 
     return BeautifulSoup(html, 'html.parser')
 
+
 class Command(BaseCommand):
-    help = 'Scrapes urls that contains report text files and downloads them to a predetermined folder.'
+    help = 'Scrapes url that contains report text files and downloads them to a predetermined folder.'
 
     def handle(self, *args, **options):
 
         logger.info('Scout started to work.')
 
         content = get_site_content()
-        cycle_headers = content.find_all('button', {'aria-label':re.compile('Cycle [0-9]+')})
+        cycle_headers = content.find_all(
+            'button',
+            {'aria-label': re.compile('Cycle [0-9]+')}
+        )
 
         for head in cycle_headers:
 
@@ -66,14 +71,16 @@ class Command(BaseCommand):
             cycle_body = content.find('div', {'aria-labelledby': head['id']})
             links = cycle_body.find_all('a')
 
-            saved_reports = Report.objects.filter(cycle=cycle_number).values_list('package_number', flat=True)
+            saved_reports = Report.objects.filter(
+                cycle=cycle_number).values_list('date_code', flat=True)
 
             for link in reversed(links):
 
                 file_name = link['href'].split('/')[-1]
-                package_number = file_name.split('_')[0]
+                date_code = int(file_name.split('_')[2].split('.')[0])
+                # TODO: Add function: file_name_parts = parse_file_name( file_name )
 
-                if package_number in saved_reports:
+                if date_code in saved_reports:
                     # Skip reports that are already saved
                     continue
 
@@ -84,11 +91,12 @@ class Command(BaseCommand):
                 save_report_file(cycle_number, file_name, r.content)
                 logger.info('Report file saved.')
 
-                # Save headinfo to model Report
+                # Save heading to model Report
+                # TODO: package_number is not unique any more -> use new field: file_name (unique)
                 report = Report(
-                    package_number = package_number,
-                    date_code = file_name.split('_')[2].replace('.txt', ''),
-                    cycle = cycle_number
+                    package_number=file_name.split('_')[0],
+                    date_code=date_code,
+                    cycle=cycle_number
                 )
                 report.save()
 
