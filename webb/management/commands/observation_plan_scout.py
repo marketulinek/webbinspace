@@ -14,13 +14,27 @@ TARGET_URL = BASE_URL + '/jwst/science-execution/observing-schedules'
 logger = logging.getLogger(__name__)
 
 
+def split_file_name(file_name):
+    """
+    Example of split:
+
+              package number     date code
+                     |               |
+    file name: 2219105f02_report_20220710
+    """
+    split_parts = file_name.split('_')
+    return {
+        'package_number': split_parts[0],
+        'date_code': int(split_parts[2])
+    }
+
+
 def save_report_file(cycle_number, file_name, content):
     """
     Saves the report file to the source_data folder and a subfolder
     with a specific cycle number.
     If the cycle folder does not exist it will be created.
     """
-
     folder = 'source_data/cycle_%s' % cycle_number
     target_path = '%s/%s' % (folder, file_name)
 
@@ -39,7 +53,6 @@ def get_site_content():
     file as LOCAL_TARGET_URL, the function returns content of the saved file.
     Otherwise, returns the content of the real target site.
     """
-
     local_target_url = config('LOCAL_TARGET_URL', default=None)
 
     if local_target_url:
@@ -76,26 +89,25 @@ class Command(BaseCommand):
 
             for link in reversed(links):
 
-                file_name = link['href'].split('/')[-1]
-                date_code = int(file_name.split('_')[2].split('.')[0])
-                # TODO: Add function: file_name_parts = parse_file_name( file_name )
+                report_file = link['href'].split('/')[-1]
+                file_name_parts = split_file_name(report_file.split('.')[0])
 
-                if date_code in saved_reports:
+                if file_name_parts['date_code'] in saved_reports:
                     # Skip reports that are already saved
                     continue
 
-                logger.info('Report file found: %s', file_name)
+                logger.info(f'Report file found: {report_file}')
 
                 # Save report file
                 r = requests.get(BASE_URL + link['href'])
-                save_report_file(cycle_number, file_name, r.content)
+                save_report_file(cycle_number, report_file, r.content)
                 logger.info('Report file saved.')
 
                 # Save heading to model Report
-                # TODO: package_number is not unique any more -> use new field: file_name (unique)
+                # TODO: handle django.db.utils.IntegrityError
                 report = Report(
-                    package_number=file_name.split('_')[0],
-                    date_code=date_code,
+                    package_number=file_name_parts['package_number'],
+                    date_code=file_name_parts['date_code'],
                     cycle=cycle_number
                 )
                 report.save()
