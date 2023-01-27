@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+from django.db import IntegrityError
 from webb.models import Report
 from bs4 import BeautifulSoup
 from decouple import config
@@ -98,18 +99,22 @@ class Command(BaseCommand):
 
                 logger.info(f'Report file found: {report_file}')
 
+                # Save heading to model Report
+                try:
+                    report = Report(
+                        package_number=file_name_parts['package_number'],
+                        date_code=file_name_parts['date_code'],
+                        cycle=cycle_number
+                    )
+                    report.save()
+                except IntegrityError:
+                    logger.warning(f'The report with this package number '
+                                   f'"{file_name_parts["package_number"]}" is already saved.')
+                    break
+
                 # Save report file
                 r = requests.get(BASE_URL + link['href'])
                 save_report_file(cycle_number, report_file, r.content)
                 logger.info('Report file saved.')
-
-                # Save heading to model Report
-                # TODO: handle django.db.utils.IntegrityError
-                report = Report(
-                    package_number=file_name_parts['package_number'],
-                    date_code=file_name_parts['date_code'],
-                    cycle=cycle_number
-                )
-                report.save()
 
         logger.info('Scout finished the work.')
