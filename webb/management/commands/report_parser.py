@@ -11,18 +11,19 @@ logger = logging.getLogger(__name__)
 
 def get_reports_to_parse():
     """
-    It searches for reports that don't have visits in the database yet.
+    Searches for reports that don't have visits in the database yet.
 
     These reports were saved in specific folder by Scout and are still
     waiting to be parsed and their information saved into database.
     """
     reports_to_parse = Report.objects.annotate(
-        num_visits=Count('visits')).filter(num_visits=0).order_by('date_code','created_at')
+        num_visits=Count('visits')).filter(num_visits=0).order_by('date_code', 'created_at')
 
     if len(reports_to_parse) < 1:
         logger.info('No reports to parse.')
 
     return reports_to_parse
+
 
 def get_type_of_report(scheduled_start_time):
 
@@ -41,12 +42,14 @@ def get_type_of_report(scheduled_start_time):
 
     return 'update'
 
+
 def invalidate_visits_from_datetime(start_time):
     """
     These visits are no longer valid because next report brings updates to the schedule.
     """
     start_time = parse_datetime(start_time)
-    return Visit.objects.filter(scheduled_start_time__gte=start_time,valid=True).update(valid=False)
+    return Visit.objects.filter(scheduled_start_time__gte=start_time, valid=True).update(valid=False)
+
 
 def line_to_list(line, column_lengths):
 
@@ -61,6 +64,7 @@ def line_to_list(line, column_lengths):
 
     return data_list
 
+
 def get_column_lengths(line):
 
     value_list = list()
@@ -69,6 +73,7 @@ def get_column_lengths(line):
 
     return value_list
 
+
 def add_category_if_not_exists(category_name):
 
     if category_name:
@@ -76,6 +81,7 @@ def add_category_if_not_exists(category_name):
         return category
 
     return None
+
 
 def format_duration(duration):
 
@@ -89,6 +95,7 @@ def format_duration(duration):
 
     return None
 
+
 def get_instrument_type(text):
 
     for choice in Visit.INSTRUMENT_CHOICES:
@@ -96,6 +103,7 @@ def get_instrument_type(text):
             return choice[0]
 
     return None
+
 
 def save_data(report, data):
 
@@ -117,6 +125,7 @@ def save_data(report, data):
         }
     )
 
+
 class Command(BaseCommand):
     help = 'Parse chosen report file and save data into database.'
 
@@ -126,7 +135,7 @@ class Command(BaseCommand):
 
         for report in get_reports_to_parse():
 
-            logger.info('Parsing the report: %s', report.file_name)
+            logger.info(f'Parsing the report: {report.file_name}')
 
             with open(report.get_path_to_file(), 'r') as reader:
 
@@ -136,25 +145,27 @@ class Command(BaseCommand):
                 column_lengths = get_column_lengths(lines[3])
                 column_names = line_to_list(lines[2], column_lengths)
 
-                for line_number, line in enumerate(lines):
+                for line_number, line in enumerate(lines[4:]):
 
-                    if line_number > 3:
+                    data_list = line_to_list(line, column_lengths)
+                    data = dict(zip(column_names, data_list))
 
-                        data_list = line_to_list(line, column_lengths)
-                        data = dict(zip(column_names, data_list))
+                    if len(data) < 1 or not data['VISIT ID']:
+                        # Skip if there is no value for VISIT ID
+                        # or the dict is empty
+                        continue
 
-                        if len(data) > 0 and data['VISIT ID']:
+                    if report_type is None:
+                        report_type = get_type_of_report(data['SCHEDULED START TIME'])
 
-                            if report_type is None:
-                                report_type = get_type_of_report(data['SCHEDULED START TIME'])
+                        if report_type == 'update':
+                            num_row_updated = invalidate_visits_from_datetime(
+                                data['SCHEDULED START TIME'])
 
-                                if report_type == 'update':
-                                    logger.info('This report file contains updates of the last report.')
-                                    num_row_updated = invalidate_visits_from_datetime(
-                                        data['SCHEDULED START TIME'])
-                                    logger.info('%i row(s) has been invalidated.', num_row_updated)
+                            logger.info('This report file contains updates of the last report.')
+                            logger.info(f'{num_row_updated} row(s) has been invalidated.')
 
-                            save_data(report, data)
+                    save_data(report, data)
 
             logger.info('Parsed.')
 
