@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Count
 from django.utils.dateparse import parse_datetime
 from webb.models import Report, Visit, Category
@@ -65,11 +65,33 @@ def line_to_list(line, column_lengths):
     return data_list
 
 
+def find_line_order_with_hyphens(lines):
+    """
+    Finds the line that contains hyphens for determining
+    the length of columns of the report file.
+
+    Returns the order of that line.
+    If not found, returns zero.
+    """
+    for line_order, line in enumerate(lines):
+        new_line = line.replace('\n', '')
+        if len(new_line) > 0 and all(c in '- ' for c in new_line):
+            return line_order
+
+    return 0
+
+
 def get_column_lengths(line):
 
     value_list = list()
     for value in line.replace('\n', '').split('  '):
         value_list.append(len(value))
+
+    # The length of the last column in report does not
+    # correspond to the number of dashes given.
+    # Setting at least 100 characters.
+    if value_list[-1] < 100:
+        value_list[-1] = 100
 
     return value_list
 
@@ -86,7 +108,7 @@ def add_category_if_not_exists(category_name):
 def format_duration(duration):
 
     if duration:
-        days,time = duration.split('/')
+        days, time = duration.split('/')
         parts_of_time = time.split(':')
         h = int(parts_of_time[0])
         m = int(parts_of_time[1])
@@ -140,12 +162,18 @@ class Command(BaseCommand):
             with open(report.get_path_to_file(), 'r') as reader:
 
                 lines = reader.readlines()
-
                 report_type = None
-                column_lengths = get_column_lengths(lines[3])
-                column_names = line_to_list(lines[2], column_lengths)
 
-                for line_number, line in enumerate(lines[4:]):
+                line_order = find_line_order_with_hyphens(lines)
+                if line_order < 1:
+                    msg = 'The line used to determine column lengths was not found.'
+                    logger.error(msg)
+                    raise CommandError(msg)
+
+                column_lengths = get_column_lengths(lines[line_order])
+                column_names = line_to_list(lines[line_order-1], column_lengths)
+
+                for line_number, line in enumerate(lines[line_order+1:]):
 
                     data_list = line_to_list(line, column_lengths)
                     data = dict(zip(column_names, data_list))
