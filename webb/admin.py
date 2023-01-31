@@ -1,22 +1,27 @@
 from django.contrib import admin
-from django.contrib.auth.models import User,Group
-from .models import Report,Category,Visit
+from django.contrib.auth.models import User, Group
+from .models import Report, Category, Visit
 
 
 class UserAdmin(admin.ModelAdmin):
     model = User
     fields = ['username']
 
+
 class ReportAdmin(admin.ModelAdmin):
     model = Report
-    list_display = ['__str__', 'created_at']
+    list_display = ['file_name', 'package_number', 'cycle', 'created_at']
     readonly_fields = ['created_at']
     list_filter = ['cycle']
 
+
 class VisitAdmin(admin.ModelAdmin):
     model = Visit
-    list_display = ['visit_id', 'scheduled_start_time', 'duration', 'target_name', 'category', 'valid']
-    search_fields = ['visit_id', 'report__package_number', 'target_name', 'category__name']
+    list_display = ['visit_id', 'scheduled_start_time', 'duration', 'target_name',
+                    'category', 'valid']
+    search_fields = ['visit_id', 'report__package_number', 'target_name',
+                     'category__name']
+
 
 admin.site.unregister(Group)
 admin.site.unregister(User)

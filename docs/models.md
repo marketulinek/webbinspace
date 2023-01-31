@@ -4,6 +4,7 @@
 ```mermaid
 classDiagram
     class Report{
+      file_name: str
       package_number: str
       date_code: int
       cycle: int
@@ -11,7 +12,6 @@ classDiagram
       __str__()
       get_absolute_url()
       get_path_to_file()
-      file_name()
     }
     class Category{
       name: str
