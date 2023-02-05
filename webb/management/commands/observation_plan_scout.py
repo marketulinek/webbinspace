@@ -15,19 +15,12 @@ TARGET_URL = BASE_URL + '/jwst/science-execution/observing-schedules'
 logger = logging.getLogger(__name__)
 
 
-def split_file_name(file_name):
+def get_package_number(file_content):
     """
-    Example of split:
-
-              package number     date code
-                     |               |
-    file name: 2219105f02_report_20220710
+    Report file contains package number on the first line.
     """
-    split_parts = file_name.split('_')
-    return {
-        'package_number': split_parts[0],
-        'date_code': int(split_parts[2])
-    }
+    lines = file_content.text.split('\n')
+    return lines[0].replace('\n', '').split(' ')[-1]
 
 
 def save_report_file(cycle_number, file_name, content):
@@ -36,8 +29,8 @@ def save_report_file(cycle_number, file_name, content):
     with a specific cycle number.
     If the cycle folder does not exist it will be created.
     """
-    folder = 'source_data/cycle_%s' % cycle_number
-    target_path = '%s/%s' % (folder, file_name)
+    folder = f'source_data/cycle_{cycle_number}'
+    target_path = f'{folder}/{file_name}'
 
     if not os.path.exists(folder):
         os.makedirs(folder, exist_ok=True)
@@ -85,36 +78,39 @@ class Command(BaseCommand):
             cycle_body = content.find('div', {'aria-labelledby': head['id']})
             links = cycle_body.find_all('a')
 
-            saved_reports = Report.objects.filter(
-                cycle=cycle_number).values_list('date_code', flat=True)
+            stored_reports = Report.objects.filter(
+                cycle=cycle_number).values_list('file_name', flat=True)
 
             for link in reversed(links):
 
-                report_file = link['href'].split('/')[-1]
-                file_name_parts = split_file_name(report_file.split('.')[0])
+                report_file_name = link['href'].split('/')[-1]
+                file_name = report_file_name.split('.')[0]
 
-                if file_name_parts['date_code'] in saved_reports:
-                    # Skip reports that are already saved
+                if file_name in stored_reports:
+                    # Skip reports that are already stored
                     continue
 
-                logger.info(f'Report file found: {report_file}')
+                logger.info(f'Report file found: {report_file_name}')
+
+                report_file = requests.get(BASE_URL + link['href'])
+                package_number = get_package_number(report_file)
 
                 # Save heading to model Report
                 try:
                     report = Report(
-                        package_number=file_name_parts['package_number'],
-                        date_code=file_name_parts['date_code'],
+                        file_name=file_name,
+                        package_number=package_number,
+                        date_code=file_name.split('_report_')[1],
                         cycle=cycle_number
                     )
                     report.save()
                 except IntegrityError:
                     logger.warning(f'The report with this package number '
-                                   f'"{file_name_parts["package_number"]}" is already saved.')
+                                   f'"{package_number}" is already saved.')
                     break
 
                 # Save report file
-                r = requests.get(BASE_URL + link['href'])
-                save_report_file(cycle_number, report_file, r.content)
+                save_report_file(cycle_number, report_file_name, report_file.content)
                 logger.info('Report file saved.')
 
         logger.info('Scout finished the work.')
