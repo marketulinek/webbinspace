@@ -5,6 +5,7 @@ from .utils import calculate_time_progress
 
 
 class Report(models.Model):
+    file_name = models.CharField(max_length=30, default='')
     package_number = models.CharField(max_length=10, unique=True)
     date_code = models.SmallIntegerField()
     cycle = models.SmallIntegerField()
@@ -14,15 +15,10 @@ class Report(models.Model):
         return self.file_name
 
     def get_absolute_url(self):
-        return reverse('report_detail', args=[self.date_code])
+        return reverse('report_detail', args=[self.package_number])
 
     def get_path_to_file(self):
-        return 'source_data/cycle_%i/%s.txt' % (self.cycle, self.file_name)
-
-    @property
-    def file_name(self):
-        """Returns the string that corresponds to the file name in the source_data folder."""
-        return '%s_report_%i' % (self.package_number, self.date_code)
+        return f'source_data/cycle_{self.cycle}/{self.file_name}.txt'
 
 
 class Category(models.Model):
@@ -82,4 +78,4 @@ class Visit(models.Model):
     def is_underway(self):
         """Returns info if the visit (target) is currently being observed or not."""
         return self.scheduled_start_time <= timezone.now() \
-               and calculate_time_progress(self.scheduled_start_time, self.duration) < 100
+            and calculate_time_progress(self.scheduled_start_time, self.duration) < 100
