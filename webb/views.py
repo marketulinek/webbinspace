@@ -61,7 +61,7 @@ def chart_of_observations(request):
         'category_durations': category_durations
     }
 
-    return render(request, 'chart_of_observations.html', context)
+    return render(request, 'observation_charts.html', context)
 
 
 class ObservingScheduleListView(SingleTableMixin, FilterView):
