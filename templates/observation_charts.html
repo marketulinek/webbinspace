@@ -6,12 +6,21 @@
 
 {% block content %}
   <h2 class="my-5 text-center">The time spent on observation on each category</h2>
-
   <div class="row">
     <div class="col-sm-12 col-lg-8 offset-lg-2">
-      <canvas id="observationChart"></canvas>
+      <canvas id="chart-category"></canvas>
     </div>
   </div>
+
+  <br><br>
+
+  <h2 class="my-5 text-center">The time spent on observation on Solar System targets</h2>
+  <div class="row">
+    <div class="col-sm-12 col-lg-8 offset-lg-2">
+      <canvas id="chart-solar-system"></canvas>
+    </div>
+  </div>
+
 {% endblock %}
 
 
@@ -19,34 +28,47 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script>
-    const ctx = document.getElementById('observationChart');
-
-    new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: [{%for category in categories %}'{{ category.name }}',{% endfor %}],
-        datasets: [{
-          label: 'The time spent in days',
-          data: [{%for duration in category_durations %}'{{ duration }}',{% endfor %}],
-          borderWidth: 1,
-          backgroundColor: 'rgba(255, 193, 7, 0.1)',
-          borderColor: 'rgba(255, 193, 7, 1)'
-        }]
-      },
-      options: {
-        indexAxis: 'y',
-        plugins: {
-          tooltip: {
-            displayColors: false,
-            callbacks: {
-              label: function(context) {
-                const categoryList = [{%for category in categories %}'{{ category.total_duration }}',{% endfor %}];
-                return categoryList[context.dataIndex];
+    function drawChart(ctx, labels, data) {
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'The time spent in days',
+            data: data,
+            borderWidth: 1,
+            backgroundColor: 'rgba(255, 193, 7, 0.1)',
+            borderColor: 'rgba(255, 193, 7, 1)'
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          plugins: {
+            tooltip: {
+              displayColors: false,
+              callbacks: {
+                label: function(context) {
+                  const categoryList = labels;
+                  return categoryList[context.dataIndex];
+                }
               }
             }
           }
         }
-      }
-    });
+      });
+    }
+
+    drawChart(
+      document.getElementById('chart-category'),
+      [{%for category in chart_categories.labels %}'{{ category.name }}',{% endfor %}],
+      [{%for duration in chart_categories.data %}'{{ duration }}',{% endfor %}]
+    )
+
+    drawChart(
+      document.getElementById('chart-solar-system'),
+      [{%for solsys in chart_solarsystem.labels %}'{{ solsys.keywords }}',{% endfor %}],
+      [{%for duration in chart_solarsystem.data %}'{{ duration }}',{% endfor %}]
+    )
   </script>
 {% endblock %}

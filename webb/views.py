@@ -46,19 +46,37 @@ def welcome_new_contributor(request):
 
 def chart_of_observations(request):
 
+    # Categories
     categories = Category.objects.exclude(
         name='Unidentified'
     ).annotate(total_duration=Sum('visits__duration'))
-    category_durations = []
 
+    category_durations = []
     for category in categories:
         category_durations.append(
             convert_duration_to_days(category.total_duration)
         )
 
+    # Solar System
+    solar_system = Visit.objects.filter(
+        category__name='Solar System'
+    ).values('keywords').annotate(total_duration=Sum('duration'))
+
+    solarsystem_durations = []
+    for solsys in solar_system:
+        solarsystem_durations.append(
+            convert_duration_to_days(solsys['total_duration'])
+        )
+
     context = {
-        'categories': categories,
-        'category_durations': category_durations
+        'chart_categories': {
+            'labels': categories,
+            'data': category_durations
+        },
+        'chart_solarsystem': {
+            'labels': solar_system,
+            'data': solarsystem_durations
+        },
     }
 
     return render(request, 'observation_charts.html', context)
