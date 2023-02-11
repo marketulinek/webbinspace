@@ -47,9 +47,8 @@ def welcome_new_contributor(request):
 def chart_of_observations(request):
 
     # Categories
-    categories = Category.objects.exclude(
-        name='Unidentified'
-    ).annotate(total_duration=Sum('visits__duration'))
+    categories = Category.objects.annotate(
+        total_duration=Sum('visits__duration'))
 
     category_durations = []
     for category in categories:
