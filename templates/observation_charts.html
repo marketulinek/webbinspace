@@ -1,24 +1,29 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Chart of Observations{% endblock %}
+{% block title %}Statistics{% endblock %}
 
 
 {% block content %}
-  <h2 class="my-5 text-center">The time spent on observation on each category</h2>
-  <div class="row">
-    <div class="col-sm-12 col-lg-8 offset-lg-2">
-      <canvas id="chart-category"></canvas>
-    </div>
-  </div>
 
-  <br><br>
+  <h2 class="my-5 text-center">Statistics on the time spent observing by</h2>
 
-  <h2 class="my-5 text-center">The time spent on observation on Solar System targets</h2>
-  <div class="row">
-    <div class="col-sm-12 col-lg-8 offset-lg-2">
-      <canvas id="chart-solar-system"></canvas>
+  <div class="row row-cols-1 row-cols-lg-2">
+
+    <div class="col">
+      <div class="chart-card py-3">
+        <h5 class="mb-4 text-center">Category</h5>
+        <canvas id="chart-category" class="px-2"></canvas>
+      </div>
     </div>
+
+    <div class="col">
+      <div class="chart-card py-3">
+        <h5 class="mb-4 text-center">Solar System</h5>
+        <canvas id="chart-solar-system" class="px-2"></canvas>
+      </div>
+    </div>
+
   </div>
 
 {% endblock %}
@@ -28,7 +33,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script>
-    function drawChart(ctx, labels, data) {
+    function drawChart(ctx, labels, subLabels, data) {
       new Chart(ctx, {
         type: 'bar',
         data: {
@@ -49,8 +54,8 @@
               displayColors: false,
               callbacks: {
                 label: function(context) {
-                  const categoryList = labels;
-                  return categoryList[context.dataIndex];
+                  const subLabelList = subLabels;
+                  return subLabelList[context.dataIndex];
                 }
               }
             }
@@ -62,12 +67,14 @@
     drawChart(
       document.getElementById('chart-category'),
       [{%for category in chart_categories.labels %}'{{ category.name }}',{% endfor %}],
+      [{%for category in chart_categories.labels %}'{{ category.total_duration }}',{% endfor %}],
       [{%for duration in chart_categories.data %}'{{ duration }}',{% endfor %}]
     )
 
     drawChart(
       document.getElementById('chart-solar-system'),
       [{%for solsys in chart_solarsystem.labels %}'{{ solsys.keywords }}',{% endfor %}],
+      [{%for solsys in chart_solarsystem.labels %}'{{ solsys.total_duration }}',{% endfor %}],
       [{%for duration in chart_solarsystem.data %}'{{ duration }}',{% endfor %}]
     )
   </script>
