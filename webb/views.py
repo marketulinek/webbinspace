@@ -1,4 +1,6 @@
+from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.db.models import Sum
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from .models import Visit, Category
@@ -44,41 +46,66 @@ def welcome_new_contributor(request):
     return render(request, 'welcome_contributor.html')
 
 
-def chart_of_observations(request):
+def statistics_view(request):
+    return render(request, 'statistics.html')
 
-    # Categories
+
+def category_duration_chart(request):
     categories = Category.objects.annotate(
         total_duration=Sum('visits__duration'))
 
-    category_durations = []
+    labels = []
+    tooltips = []
+    durations = []
     for category in categories:
-        category_durations.append(
+        labels.append(category.name)
+        tooltips.append(str(naturaltime(category.total_duration)))
+        durations.append(
             convert_duration_to_days(category.total_duration)
         )
 
-    # Solar System
+    return JsonResponse({
+        'title': 'Category',
+        'data': {
+          'labels': labels,
+          'datasets': [{
+            'label': 'The time spent in days',
+            'data': durations,
+            'borderWidth': 1,
+            'backgroundColor': 'rgba(255, 193, 7, 0.1)',
+            'borderColor': 'rgba(255, 193, 7, 1)'
+          }]
+        },
+        'tooltips': tooltips
+    })
+
+
+def solarsystem_duration_chart(request):
     solar_system = Visit.objects.filter(
         category__name='Solar System'
     ).values('keywords').annotate(total_duration=Sum('duration'))
 
-    solarsystem_durations = []
+    labels = []
+    durations = []
     for solsys in solar_system:
-        solarsystem_durations.append(
+        labels.append(solsys['keywords'])
+        durations.append(
             convert_duration_to_days(solsys['total_duration'])
         )
 
-    context = {
-        'chart_categories': {
-            'labels': categories,
-            'data': category_durations
-        },
-        'chart_solarsystem': {
-            'labels': solar_system,
-            'data': solarsystem_durations
-        },
-    }
-
-    return render(request, 'observation_charts.html', context)
+    return JsonResponse({
+        'title': 'Category',
+        'data': {
+          'labels': labels,
+          'datasets': [{
+            'label': 'The time spent in days',
+            'data': durations,
+            'borderWidth': 1,
+            'backgroundColor': 'rgba(255, 193, 7, 0.1)',
+            'borderColor': 'rgba(255, 193, 7, 1)'
+          }]
+        }
+    })
 
 
 class ObservingScheduleListView(SingleTableMixin, FilterView):
