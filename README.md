@@ -36,4 +36,5 @@ ALLOWED_HOSTS=127.0.0.1,localhost
 ## Built With
 * [Django](https://www.djangoproject.com/) - Python web framework
 * [Bootstrap](https://getbootstrap.com/) - Front-end framework
+* [Chart.js](https://www.chartjs.org/) - JavaScript charting library
 * [Mermaid](https://mermaid-js.github.io/mermaid/#/) - JavaScript-based diagramming and charting tool
