@@ -12,4 +12,5 @@ urlpatterns = [
     path('chart/category-duration/', views.category_duration_chart, name='chart_category_duration'),
     path('chart/instrument-duration/', views.instrument_duration_chart, name='chart_instrument_duration'),
     path('chart/solarsystem-duration/', views.solarsystem_duration_chart, name='chart_solarsystem_duration'),
+    path('chart/planet-duration/', views.planet_duration_chart, name='chart_planet_duration'),
 ]

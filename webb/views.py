@@ -69,7 +69,7 @@ def category_duration_chart(request):
         'data': {
           'labels': labels,
           'datasets': [{
-            'label': 'The time spent in days',
+            'label': 'The time spent in days, hours',
             'data': durations,
             'borderWidth': 1,
             'backgroundColor': 'rgba(255, 193, 7, 0.1)',
@@ -102,7 +102,7 @@ def instrument_duration_chart(request):
         'data': {
             'labels': labels,
             'datasets': [{
-                'label': 'The time spent in days',
+                'label': 'The time spent in days, hours',
                 'data': durations,
                 'borderWidth': 1,
                 'backgroundColor': 'rgba(255, 193, 7, 0.1)',
@@ -133,7 +133,46 @@ def solarsystem_duration_chart(request):
         'data': {
           'labels': labels,
           'datasets': [{
-            'label': 'The time spent in days',
+            'label': 'The time spent in days, hours',
+            'data': durations,
+            'borderWidth': 1,
+            'backgroundColor': 'rgba(255, 193, 7, 0.1)',
+            'borderColor': 'rgba(255, 193, 7, 1)'
+          }]
+        },
+        'tooltips': tooltips
+    })
+
+
+def planet_duration_chart(request):
+    planets = ('MERCURY', 'VENUS', 'EARTH', 'MARS', 'JUPITER', 'SATURN', 'URANUS', 'NEPTUNE')
+    visits = Visit.objects.filter(category__name='Solar System', keywords='Planet')
+
+    labels = []
+    tooltips = []
+    durations = []
+
+    for planet in planets[3:]:
+        # Loop from Mars because there are no plans
+        # to observe the first three planets.
+
+        planet_qs = visits.filter(
+            target_name__icontains=planet
+        ).values('keywords').annotate(total_duration=Sum('duration'))
+
+        for planet_data in planet_qs:
+            if planet_data is not None:
+                labels.append(planet)
+                tooltips.append(str(naturaltime(planet_data['total_duration'])))
+                durations.append(
+                    convert_duration_to_days(planet_data['total_duration'])
+                )
+
+    return JsonResponse({
+        'data': {
+          'labels': labels,
+          'datasets': [{
+            'label': 'The time spent in days, hours',
             'data': durations,
             'borderWidth': 1,
             'backgroundColor': 'rgba(255, 193, 7, 0.1)',

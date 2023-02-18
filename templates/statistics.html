@@ -33,6 +33,12 @@
         <canvas id="chart-solar-system" class="px-2"></canvas>
       </div>
     </div>
+    <div class="col my-3">
+      <div class="chart-card py-3">
+        <h5 class="mb-4 text-center">Planet</h5>
+        <canvas id="chart-planet" class="px-2"></canvas>
+      </div>
+    </div>
   </div>
 {% endblock %}
 
@@ -43,6 +49,7 @@
       loadChart(categoryDurationChart, '{% url 'chart_category_duration' %}');
       loadChart(instrumentDurationChart, '{% url 'chart_instrument_duration' %}');
       loadChart(solarSystemDurationChart, '{% url 'chart_solarsystem_duration' %}');
+      loadChart(planetDurationChart, '{% url 'chart_planet_duration' %}');
     });
 
     var categoryDurationCtx = document.getElementById('chart-category');
@@ -75,6 +82,20 @@
 
     var solarSystemDurationCtx = document.getElementById('chart-solar-system');
     var solarSystemDurationChart = new Chart(solarSystemDurationCtx, {
+      type: 'bar',
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        plugins: {
+          tooltip: {
+            displayColors: false
+          }
+        }
+      }
+    });
+
+    var planetDurationCtx = document.getElementById('chart-planet');
+    var planetDurationChart = new Chart(planetDurationCtx, {
       type: 'bar',
       options: {
         indexAxis: 'y',
