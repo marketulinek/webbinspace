@@ -66,7 +66,6 @@ def category_duration_chart(request):
         )
 
     return JsonResponse({
-        'title': 'Category',
         'data': {
           'labels': labels,
           'datasets': [{
@@ -76,6 +75,39 @@ def category_duration_chart(request):
             'backgroundColor': 'rgba(255, 193, 7, 0.1)',
             'borderColor': 'rgba(255, 193, 7, 1)'
           }]
+        },
+        'tooltips': tooltips
+    })
+
+
+def instrument_duration_chart(request):
+    instruments = Visit.objects.filter(
+        instrument__isnull=False
+    ).values('instrument').annotate(total_duration=Sum('duration'))
+
+    labels = []
+    tooltips = []
+    durations = []
+
+    instrument_dict = dict((key, value) for key, value in Visit.INSTRUMENT_CHOICES)
+
+    for instrument in instruments:
+        labels.append(instrument_dict[instrument['instrument']])
+        tooltips.append(str(naturaltime(instrument['total_duration'])))
+        durations.append(
+            convert_duration_to_days(instrument['total_duration'])
+        )
+
+    return JsonResponse({
+        'data': {
+            'labels': labels,
+            'datasets': [{
+                'label': 'The time spent in days',
+                'data': durations,
+                'borderWidth': 1,
+                'backgroundColor': 'rgba(255, 193, 7, 0.1)',
+                'borderColor': 'rgba(255, 193, 7, 1)'
+            }]
         },
         'tooltips': tooltips
     })
@@ -98,7 +130,6 @@ def solarsystem_duration_chart(request):
         )
 
     return JsonResponse({
-        'title': 'Category',
         'data': {
           'labels': labels,
           'datasets': [{
