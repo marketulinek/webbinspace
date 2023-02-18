@@ -4,9 +4,10 @@
 {% block title %}Statistics{% endblock %}
 
 
-{% block cdn %}
+{% block headscript %}
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{% static 'js/statistics.js' %}"></script>
 {% endblock %}
 
 
@@ -32,32 +33,6 @@
 
 {% block script %}
   <script>
-    function loadChart(chart, endpoint) {
-      $.ajax({
-        url: endpoint,
-        type: 'GET',
-        dataType: 'json',
-        success: (jsonResponse) => {
-
-          const labels = jsonResponse.data.labels;
-          const tooltips = jsonResponse.tooltips;
-          const datasets = jsonResponse.data.datasets;
-
-          // Load data into the chart
-          chart.data.labels = labels;
-          datasets.forEach(dataset => {
-            chart.data.datasets.push(dataset);
-          });
-          chart.options.plugins.tooltip.callbacks.label = function(context) {
-            return tooltips[context.dataIndex];
-          };
-
-          chart.update();
-        },
-        error: () => console.log('Failed to fetch chart data from ' + endpoint + '.'),
-      });
-    }
-
     $(document).ready(function() {
       loadChart(categoryDurationChart, '{% url 'chart_category_duration' %}');
       loadChart(solarSystemDurationChart, '{% url 'chart_solarsystem_duration' %}');
