@@ -57,6 +57,7 @@ def category_duration_chart(request):
     labels = []
     tooltips = []
     durations = []
+
     for category in categories:
         labels.append(category.name)
         tooltips.append(str(naturaltime(category.total_duration)))
@@ -86,9 +87,12 @@ def solarsystem_duration_chart(request):
     ).values('keywords').annotate(total_duration=Sum('duration'))
 
     labels = []
+    tooltips = []
     durations = []
+
     for solsys in solar_system:
         labels.append(solsys['keywords'])
+        tooltips.append(str(naturaltime(solsys['total_duration'])))
         durations.append(
             convert_duration_to_days(solsys['total_duration'])
         )
@@ -104,7 +108,8 @@ def solarsystem_duration_chart(request):
             'backgroundColor': 'rgba(255, 193, 7, 0.1)',
             'borderColor': 'rgba(255, 193, 7, 1)'
           }]
-        }
+        },
+        'tooltips': tooltips
     })
 
 
