@@ -53,59 +53,15 @@
     });
 
     var categoryDurationCtx = document.getElementById('chart-category');
-    var categoryDurationChart = new Chart(categoryDurationCtx, {
-      type: 'bar',
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        plugins: {
-          tooltip: {
-            displayColors: false
-          }
-        }
-      }
-    });
+    var categoryDurationChart = new Chart(categoryDurationCtx, {type: 'bar'});
 
     var instrumentDurationCtx = document.getElementById('chart-instrument');
-    var instrumentDurationChart = new Chart(instrumentDurationCtx, {
-      type: 'bar',
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        plugins: {
-          tooltip: {
-            displayColors: false
-          }
-        }
-      }
-    });
+    var instrumentDurationChart = new Chart(instrumentDurationCtx, {type: 'bar'});
 
     var solarSystemDurationCtx = document.getElementById('chart-solar-system');
-    var solarSystemDurationChart = new Chart(solarSystemDurationCtx, {
-      type: 'bar',
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        plugins: {
-          tooltip: {
-            displayColors: false
-          }
-        }
-      }
-    });
+    var solarSystemDurationChart = new Chart(solarSystemDurationCtx, {type: 'bar'});
 
     var planetDurationCtx = document.getElementById('chart-planet');
-    var planetDurationChart = new Chart(planetDurationCtx, {
-      type: 'bar',
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        plugins: {
-          tooltip: {
-            displayColors: false
-          }
-        }
-      }
-    });
+    var planetDurationChart = new Chart(planetDurationCtx, {type: 'bar'});
   </script>
 {% endblock %}

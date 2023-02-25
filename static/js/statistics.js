@@ -8,12 +8,14 @@ function loadChart(chart, endpoint) {
       const labels = jsonResponse.data.labels;
       const tooltips = jsonResponse.tooltips;
       const datasets = jsonResponse.data.datasets;
+      const options = jsonResponse.options;
 
       // Load data into the chart
       chart.data.labels = labels;
       datasets.forEach(dataset => {
         chart.data.datasets.push(dataset);
       });
+      chart.options = options;
       chart.options.plugins.tooltip.callbacks.label = function(context) {
         return tooltips[context.dataIndex];
       };

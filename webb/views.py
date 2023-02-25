@@ -1,8 +1,8 @@
 from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.db.models import Sum
-from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils import timezone
+from .chart import TimeSpentObservingChart
 from .models import Visit, Category
 from .utils import get_observing_progress, convert_duration_to_days
 from .filters import VisitFilter
@@ -54,9 +54,7 @@ def category_duration_chart(request):
     categories = Category.objects.annotate(
         total_duration=Sum('visits__duration'))
 
-    labels = []
-    tooltips = []
-    durations = []
+    labels, tooltips, durations = [], [], []
 
     for category in categories:
         labels.append(category.name)
@@ -65,19 +63,7 @@ def category_duration_chart(request):
             convert_duration_to_days(category.total_duration)
         )
 
-    return JsonResponse({
-        'data': {
-          'labels': labels,
-          'datasets': [{
-            'label': 'The time spent in days, hours',
-            'data': durations,
-            'borderWidth': 1,
-            'backgroundColor': 'rgba(255, 193, 7, 0.1)',
-            'borderColor': 'rgba(255, 193, 7, 1)'
-          }]
-        },
-        'tooltips': tooltips
-    })
+    return TimeSpentObservingChart(labels, durations, tooltips).create_json()
 
 
 def instrument_duration_chart(request):
@@ -85,10 +71,7 @@ def instrument_duration_chart(request):
         instrument__isnull=False
     ).values('instrument').annotate(total_duration=Sum('duration'))
 
-    labels = []
-    tooltips = []
-    durations = []
-
+    labels, tooltips, durations = [], [], []
     instrument_dict = dict((key, value) for key, value in Visit.INSTRUMENT_CHOICES)
 
     for instrument in instruments:
@@ -98,19 +81,7 @@ def instrument_duration_chart(request):
             convert_duration_to_days(instrument['total_duration'])
         )
 
-    return JsonResponse({
-        'data': {
-            'labels': labels,
-            'datasets': [{
-                'label': 'The time spent in days, hours',
-                'data': durations,
-                'borderWidth': 1,
-                'backgroundColor': 'rgba(255, 193, 7, 0.1)',
-                'borderColor': 'rgba(255, 193, 7, 1)'
-            }]
-        },
-        'tooltips': tooltips
-    })
+    return TimeSpentObservingChart(labels, durations, tooltips).create_json()
 
 
 def solarsystem_duration_chart(request):
@@ -118,9 +89,7 @@ def solarsystem_duration_chart(request):
         category__name='Solar System'
     ).values('keywords').annotate(total_duration=Sum('duration'))
 
-    labels = []
-    tooltips = []
-    durations = []
+    labels, tooltips, durations = [], [], []
 
     for solsys in solar_system:
         labels.append(solsys['keywords'])
@@ -129,33 +98,18 @@ def solarsystem_duration_chart(request):
             convert_duration_to_days(solsys['total_duration'])
         )
 
-    return JsonResponse({
-        'data': {
-          'labels': labels,
-          'datasets': [{
-            'label': 'The time spent in days, hours',
-            'data': durations,
-            'borderWidth': 1,
-            'backgroundColor': 'rgba(255, 193, 7, 0.1)',
-            'borderColor': 'rgba(255, 193, 7, 1)'
-          }]
-        },
-        'tooltips': tooltips
-    })
+    return TimeSpentObservingChart(labels, durations, tooltips).create_json()
 
 
 def planet_duration_chart(request):
     planets = ('MERCURY', 'VENUS', 'EARTH', 'MARS', 'JUPITER', 'SATURN', 'URANUS', 'NEPTUNE')
     visits = Visit.objects.filter(category__name='Solar System', keywords='Planet')
 
-    labels = []
-    tooltips = []
-    durations = []
+    labels, tooltips, durations = [], [], []
 
     for planet in planets[3:]:
         # Loop from Mars because there are no plans
         # to observe the first three planets.
-
         planet_qs = visits.filter(
             target_name__icontains=planet
         ).values('keywords').annotate(total_duration=Sum('duration'))
@@ -168,19 +122,7 @@ def planet_duration_chart(request):
                     convert_duration_to_days(planet_data['total_duration'])
                 )
 
-    return JsonResponse({
-        'data': {
-          'labels': labels,
-          'datasets': [{
-            'label': 'The time spent in days, hours',
-            'data': durations,
-            'borderWidth': 1,
-            'backgroundColor': 'rgba(255, 193, 7, 0.1)',
-            'borderColor': 'rgba(255, 193, 7, 1)'
-          }]
-        },
-        'tooltips': tooltips
-    })
+    return TimeSpentObservingChart(labels, durations, tooltips).create_json()
 
 
 class ObservingScheduleListView(SingleTableMixin, FilterView):
