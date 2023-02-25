@@ -57,7 +57,7 @@ class TimeSpentObservingChart(Chart):
     def __init__(self, data_labels, dataset_data, tooltip_label):
 
         dataset_label = 'The time spent in days, hours'
-        super().__init__('line', data_labels, dataset_label, dataset_data)
+        super().__init__('bar', data_labels, dataset_label, dataset_data)
 
         self.tooltip_label = tooltip_label
         self.options = {

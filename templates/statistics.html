@@ -46,22 +46,22 @@
 {% block script %}
   <script>
     $(document).ready(function() {
-      loadChart(categoryDurationChart, '{% url 'chart_category_duration' %}');
-      loadChart(instrumentDurationChart, '{% url 'chart_instrument_duration' %}');
-      loadChart(solarSystemDurationChart, '{% url 'chart_solarsystem_duration' %}');
-      loadChart(planetDurationChart, '{% url 'chart_planet_duration' %}');
+      loadChart(categoryChart, '{% url 'chart_category_duration' %}');
+      loadChart(instrumentChart, '{% url 'chart_instrument_duration' %}');
+      loadChart(solarSystemChart, '{% url 'chart_solarsystem_duration' %}');
+      loadChart(planetChart, '{% url 'chart_planet_duration' %}');
     });
 
-    var categoryDurationCtx = document.getElementById('chart-category');
-    var categoryDurationChart = new Chart(categoryDurationCtx, {type: 'bar'});
+    var categoryCtx = document.getElementById('chart-category');
+    var categoryChart = new Chart(categoryCtx, {type: 'bar'});
 
-    var instrumentDurationCtx = document.getElementById('chart-instrument');
-    var instrumentDurationChart = new Chart(instrumentDurationCtx, {type: 'bar'});
+    var instrumentCtx = document.getElementById('chart-instrument');
+    var instrumentChart = new Chart(instrumentCtx, {type: 'bar'});
 
-    var solarSystemDurationCtx = document.getElementById('chart-solar-system');
-    var solarSystemDurationChart = new Chart(solarSystemDurationCtx, {type: 'bar'});
+    var solarSystemCtx = document.getElementById('chart-solar-system');
+    var solarSystemChart = new Chart(solarSystemCtx, {type: 'bar'});
 
-    var planetDurationCtx = document.getElementById('chart-planet');
-    var planetDurationChart = new Chart(planetDurationCtx, {type: 'bar'});
+    var planetCtx = document.getElementById('chart-planet');
+    var planetChart = new Chart(planetCtx, {type: 'bar'});
   </script>
 {% endblock %}
