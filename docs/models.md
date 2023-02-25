@@ -11,7 +11,7 @@ classDiagram
       created_at: DateTime
       __str__()
       get_absolute_url()
-      get_path_to_file()
+      get_file_path()
     }
     class Category{
       name: str

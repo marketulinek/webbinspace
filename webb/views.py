@@ -1,6 +1,8 @@
+from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.db.models import Sum
 from django.shortcuts import render, redirect
 from django.utils import timezone
+from .chart import TimeSpentObservingChart
 from .models import Visit, Category
 from .utils import get_observing_progress, convert_duration_to_days
 from .filters import VisitFilter
@@ -44,24 +46,83 @@ def welcome_new_contributor(request):
     return render(request, 'welcome_contributor.html')
 
 
-def chart_of_observations(request):
+def statistics_view(request):
+    return render(request, 'statistics.html')
 
-    categories = Category.objects.exclude(
-        name='Unidentified'
-    ).annotate(total_duration=Sum('visits__duration'))
-    category_durations = []
+
+def category_duration_chart(request):
+    categories = Category.objects.annotate(
+        total_duration=Sum('visits__duration'))
+
+    labels, tooltips, durations = [], [], []
 
     for category in categories:
-        category_durations.append(
+        labels.append(category.name)
+        tooltips.append(str(naturaltime(category.total_duration)))
+        durations.append(
             convert_duration_to_days(category.total_duration)
         )
 
-    context = {
-        'categories': categories,
-        'category_durations': category_durations
-    }
+    return TimeSpentObservingChart(labels, durations, tooltips).create_json()
 
-    return render(request, 'chart_of_observations.html', context)
+
+def instrument_duration_chart(request):
+    instruments = Visit.objects.filter(
+        instrument__isnull=False
+    ).values('instrument').annotate(total_duration=Sum('duration'))
+
+    labels, tooltips, durations = [], [], []
+    instrument_dict = dict((key, value) for key, value in Visit.INSTRUMENT_CHOICES)
+
+    for instrument in instruments:
+        labels.append(instrument_dict[instrument['instrument']])
+        tooltips.append(str(naturaltime(instrument['total_duration'])))
+        durations.append(
+            convert_duration_to_days(instrument['total_duration'])
+        )
+
+    return TimeSpentObservingChart(labels, durations, tooltips).create_json()
+
+
+def solarsystem_duration_chart(request):
+    solar_system = Visit.objects.filter(
+        category__name='Solar System'
+    ).values('keywords').annotate(total_duration=Sum('duration'))
+
+    labels, tooltips, durations = [], [], []
+
+    for solsys in solar_system:
+        labels.append(solsys['keywords'])
+        tooltips.append(str(naturaltime(solsys['total_duration'])))
+        durations.append(
+            convert_duration_to_days(solsys['total_duration'])
+        )
+
+    return TimeSpentObservingChart(labels, durations, tooltips).create_json()
+
+
+def planet_duration_chart(request):
+    planets = ('MERCURY', 'VENUS', 'EARTH', 'MARS', 'JUPITER', 'SATURN', 'URANUS', 'NEPTUNE')
+    visits = Visit.objects.filter(category__name='Solar System', keywords='Planet')
+
+    labels, tooltips, durations = [], [], []
+
+    for planet in planets[3:]:
+        # Loop from Mars because there are no plans
+        # to observe the first three planets.
+        planet_qs = visits.filter(
+            target_name__icontains=planet
+        ).values('keywords').annotate(total_duration=Sum('duration'))
+
+        for planet_data in planet_qs:
+            if planet_data is not None:
+                labels.append(planet)
+                tooltips.append(str(naturaltime(planet_data['total_duration'])))
+                durations.append(
+                    convert_duration_to_days(planet_data['total_duration'])
+                )
+
+    return TimeSpentObservingChart(labels, durations, tooltips).create_json()
 
 
 class ObservingScheduleListView(SingleTableMixin, FilterView):

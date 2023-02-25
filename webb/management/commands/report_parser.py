@@ -159,7 +159,7 @@ class Command(BaseCommand):
 
             logger.info(f'Parsing the report: {report.file_name}')
 
-            with open(report.get_path_to_file(), 'r') as reader:
+            with open(report.get_file_path(), 'r') as reader:
 
                 lines = reader.readlines()
                 report_type = None

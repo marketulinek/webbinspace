@@ -90,7 +90,7 @@ if DEVELOPMENT_MODE or USE_SQLITE:
     }
 elif len(sys.argv) > 0 and sys.argv[1] != 'collectstatic':
     if DATABASE_URL is None:
-        raise Exception("DATABASE_URL environment variable not defined")
+        raise NameError("DATABASE_URL environment variable not defined!")
 #    DATABASES = {
 #        'default': dj_database_url.parse(DATABASE_URL),
 #    }

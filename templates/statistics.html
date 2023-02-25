@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Statistics{% endblock %}
+
+
+{% block headscript %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{% static 'js/statistics.js' %}"></script>
+{% endblock %}
+
+
+{% block content %}
+  <h2 class="my-5 text-center">Statistics on the time spent observing</h2>
+
+  <div class="row row-cols-1 row-cols-lg-2">
+    <div class="col my-3">
+      <div class="chart-card py-3">
+        <h5 class="mb-4 text-center">Category</h5>
+        <canvas id="chart-category" class="px-2"></canvas>
+      </div>
+    </div>
+    <div class="col my-3">
+      <div class="chart-card py-3">
+        <h5 class="mb-4 text-center">Instrument</h5>
+        <canvas id="chart-instrument" class="px-2"></canvas>
+      </div>
+    </div>
+    <div class="col my-3">
+      <div class="chart-card py-3">
+        <h5 class="mb-4 text-center">Solar System</h5>
+        <canvas id="chart-solar-system" class="px-2"></canvas>
+      </div>
+    </div>
+    <div class="col my-3">
+      <div class="chart-card py-3">
+        <h5 class="mb-4 text-center">Planet</h5>
+        <canvas id="chart-planet" class="px-2"></canvas>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+
+{% block script %}
+  <script>
+    $(document).ready(function() {
+      loadChart(categoryChart, '{% url 'chart_category_duration' %}');
+      loadChart(instrumentChart, '{% url 'chart_instrument_duration' %}');
+      loadChart(solarSystemChart, '{% url 'chart_solarsystem_duration' %}');
+      loadChart(planetChart, '{% url 'chart_planet_duration' %}');
+    });
+
+    var categoryCtx = document.getElementById('chart-category');
+    var categoryChart = new Chart(categoryCtx, {type: 'bar'});
+
+    var instrumentCtx = document.getElementById('chart-instrument');
+    var instrumentChart = new Chart(instrumentCtx, {type: 'bar'});
+
+    var solarSystemCtx = document.getElementById('chart-solar-system');
+    var solarSystemChart = new Chart(solarSystemCtx, {type: 'bar'});
+
+    var planetCtx = document.getElementById('chart-planet');
+    var planetChart = new Chart(planetCtx, {type: 'bar'});
+  </script>
+{% endblock %}

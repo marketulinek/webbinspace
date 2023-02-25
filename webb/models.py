@@ -17,7 +17,7 @@ class Report(models.Model):
     def get_absolute_url(self):
         return reverse('report_detail', args=[self.package_number])
 
-    def get_path_to_file(self):
+    def get_file_path(self):
         return f'source_data/cycle_{self.cycle}/{self.file_name}.txt'
 
 
@@ -36,10 +36,10 @@ class Category(models.Model):
 
 class Visit(models.Model):
     INSTRUMENT_CHOICES = (
-        ('1', 'NIRCam'),
-        ('2', 'NIRSpec'),
-        ('3', 'MIRI'),
-        ('4', 'NIRISS')
+        ('1', 'NIRCam'),  # Near-Infrared Camera
+        ('2', 'NIRSpec'),  # Near-Infrared Spectrograph
+        ('3', 'MIRI'),  # Mid-InfraRed Instrument
+        ('4', 'NIRISS')  # Near-Infrared Imager and Slitless Spectrograph
     )
 
     report = models.ForeignKey(
