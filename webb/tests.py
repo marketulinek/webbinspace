@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
-from .models import Report, Visit
+from .models import Report, Category, Visit
 from .management.commands.report_parser import get_instrument_type, format_duration, get_column_lengths, \
     get_type_of_report, find_line_order_with_hyphens
 import datetime
@@ -9,13 +9,18 @@ import datetime
 class WebbTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.report = Report.objects.create(package_number='2219105f02', date_code='20220710', cycle=1)
+        cls.report = Report.objects.create(
+            file_name='2219105f02_report_20220710', package_number='2219105f02', date_code='20220710', cycle=1
+        )
+
+        cls.category = Category.objects.create(name='Solar System')
 
         cls.visit_one = Visit.objects.create(report=cls.report,
                                              visit_id='2739:4:1',
                                              scheduled_start_time='2022-07-14T19:00:00Z',
                                              duration=format_duration('00/00:12:06'),
                                              target_name='Neptune',
+                                             category=cls.category,
                                              keywords='Planet')
 
         cls.visit_two = Visit.objects.create(report=cls.report,
@@ -24,6 +29,24 @@ class WebbTests(TestCase):
                                              duration=format_duration('00/00:12:06'),
                                              target_name='Jupiter',
                                              keywords='Planet')
+
+    def test_report_model(self):
+        self.assertEqual(self.report.file_name, '2219105f02_report_20220710')
+        self.assertEqual(self.report.package_number, '2219105f02')
+        self.assertEqual(self.report.date_code, '20220710')
+        self.assertEqual(self.report.cycle, 1)
+
+    def test_category_model(self):
+        self.assertEqual(self.category.name, 'Solar System')
+
+    def test_visit_model(self):
+        self.assertEqual(self.visit_one.report.file_name, '2219105f02_report_20220710')
+        self.assertEqual(self.visit_one.visit_id, '2739:4:1')
+        self.assertEqual(self.visit_one.scheduled_start_time, '2022-07-14T19:00:00Z')
+        self.assertEqual(self.visit_one.duration, datetime.timedelta(minutes=12, seconds=6))
+        self.assertEqual(self.visit_one.target_name, 'Neptune')
+        self.assertEqual(self.visit_one.category.name, 'Solar System')
+        self.assertEqual(self.visit_one.keywords, 'Planet')
 
     def test_url_exists_at_correct_location(self):
         response = self.client.get('/')
