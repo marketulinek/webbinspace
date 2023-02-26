@@ -12,15 +12,15 @@ class WelcomeTests(TestCase):
         response = self.client.get(reverse('homepage'))
         self.assertEqual(response.status_code, 302)
 
+    def test_url_exists_at_correct_location(self):
+        response = self.client.get('/welcome/')
+        self.assertEqual(response.status_code, 200)
+
     def test_welcome(self):
         response = self.client.get(reverse('welcome'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'welcome_contributor.html')
         self.assertContains(response, 'Hello Space!')
-
-    def test_url_exists_at_correct_location(self):
-        response = self.client.get('/welcome/')
-        self.assertEqual(response.status_code, 200)
 
 
 class WebbTests(TestCase):
@@ -64,6 +64,7 @@ class WebbTests(TestCase):
         self.assertEqual(self.visit_one.target_name, 'Neptune')
         self.assertEqual(self.visit_one.category.name, 'Solar System')
         self.assertEqual(self.visit_one.keywords, 'Planet')
+        self.assertEqual(self.visit_one.valid, True)
 
     def test_url_exists_at_correct_location_homepage(self):
         response = self.client.get('/')
@@ -74,6 +75,26 @@ class WebbTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'home.html')
         self.assertContains(response, 'Webb is observing..')
+
+    def test_url_exists_at_correct_location_statistics_view(self):
+        response = self.client.get('/statistics/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_statistics_view(self):
+        response = self.client.get(reverse('statistics'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'statistics.html')
+        self.assertContains(response, 'Statistics on the time spent observing')
+
+    def test_url_exists_at_correct_location_observingschedule_listview(self):
+        response = self.client.get('/observing-schedules/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_observingschedule_listview(self):
+        response = self.client.get(reverse('observing_schedules'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'observation_schedule.html')
+        self.assertContains(response, 'Observing Schedules')
 
 
 class ReportParserTests(TestCase):
