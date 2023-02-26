@@ -18,6 +18,10 @@ class WelcomeTests(TestCase):
         self.assertTemplateUsed(response, 'welcome_contributor.html')
         self.assertContains(response, 'Hello Space!')
 
+    def test_url_exists_at_correct_location(self):
+        response = self.client.get('/welcome/')
+        self.assertEqual(response.status_code, 200)
+
 
 class WebbTests(TestCase):
     @classmethod
