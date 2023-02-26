@@ -6,6 +6,19 @@ from .management.commands.report_parser import get_instrument_type, format_durat
 import datetime
 
 
+class WelcomeTests(TestCase):
+
+    def test_homepage_without_data(self):
+        response = self.client.get(reverse('homepage'))
+        self.assertEqual(response.status_code, 302)
+
+    def test_welcome(self):
+        response = self.client.get(reverse('welcome'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'welcome_contributor.html')
+        self.assertContains(response, 'Hello Space!')
+
+
 class WebbTests(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -48,7 +61,7 @@ class WebbTests(TestCase):
         self.assertEqual(self.visit_one.category.name, 'Solar System')
         self.assertEqual(self.visit_one.keywords, 'Planet')
 
-    def test_url_exists_at_correct_location(self):
+    def test_url_exists_at_correct_location_homepage(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
 
