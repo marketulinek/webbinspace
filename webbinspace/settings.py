@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'webb.apps.WebbConfig',
 
     # Ext apps
+    'debug_toolbar',
     'django_tables2',
     'django_filters',
     'crispy_forms',
@@ -51,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware'
 ]
 
 ROOT_URLCONF = 'webbinspace.urls'
@@ -73,6 +75,14 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'webbinspace.wsgi.application'
+
+
+# Django Debug Toolbar
+# https://django-debug-toolbar.readthedocs.io/en/latest/index.html
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
 
 
 # Database
