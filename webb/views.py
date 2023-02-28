@@ -3,17 +3,17 @@ from django.db.models import Sum
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from .chart import TimeSpentObservingChart
-from .models import Visit, Category
-from .utils import get_observing_progress, convert_duration_to_days
 from .filters import VisitFilter
+from .models import Visit, Category
+from .tables import ObservingScheduleTable
+from .utils import get_observing_progress, convert_duration_to_days
 from django_filters.views import FilterView
 from django_tables2.views import SingleTableMixin
-import webb.tables as tables
 
 
 def homepage(request):
 
-    prev_current_target = Visit.objects.filter(
+    prev_current_target = Visit.objects.select_related('category').filter(
         scheduled_start_time__lte=timezone.now(),
         valid=True).order_by('-scheduled_start_time')[:2]
 
@@ -23,7 +23,7 @@ def homepage(request):
     prev_target = prev_current_target[1]
     current_target = prev_current_target[0]
 
-    next_target = Visit.objects.filter(
+    next_target = Visit.objects.select_related('category').filter(
         scheduled_start_time__gte=timezone.now(),
         valid=True).order_by('scheduled_start_time').first()
 
@@ -127,11 +127,11 @@ def planet_duration_chart(request):
 
 class ObservingScheduleListView(SingleTableMixin, FilterView):
     model = Visit
-    table_class = tables.ObservingScheduleTable
+    table_class = ObservingScheduleTable
     template_name = 'observation_schedule.html'
     filterset_class = VisitFilter
 
     def get_queryset(self):
-        return Visit.objects.filter(
+        return Visit.objects.select_related('category').filter(
             scheduled_start_time__isnull=False,
             valid=True).order_by('-scheduled_start_time')
