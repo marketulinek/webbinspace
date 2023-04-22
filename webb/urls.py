@@ -6,6 +6,7 @@ urlpatterns = [
     path('', views.homepage, name='homepage'),
     path('welcome/', views.welcome_new_contributor, name='welcome'),
     path('observing-schedules/', views.ObservingScheduleListView.as_view(), name='observing_schedules'),
+    path('reports/cycle-<int:cycle_number>/', views.ReportListView.as_view(), name='report_list'),
     path('statistics/', views.statistics_view, name='statistics'),
 
     # Charts for statistics
