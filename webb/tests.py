@@ -96,6 +96,16 @@ class WebbTests(TestCase):
         self.assertTemplateUsed(response, 'observation_schedule.html')
         self.assertContains(response, 'Observing Schedules')
 
+    def test_url_exists_at_correct_location_report_listview(self):
+        response = self.client.get('/reports/cycle-1/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_report_listview(self):
+        response = self.client.get(reverse('report_list', kwargs={'cycle_number': 1}))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'report_list.html')
+        self.assertContains(response, 'Report List')
+
 
 class ReportParserTests(TestCase):
     @classmethod
