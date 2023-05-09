@@ -29,6 +29,9 @@ class WebbTests(TestCase):
         cls.report = Report.objects.create(
             file_name='2219105f02_report_20220710', package_number='2219105f02', date_code='20220710', cycle=1
         )
+        cls.report_two = Report.objects.create(
+            file_name='20230423_report_20230421', package_number='2311308f03', date_code='20230421', cycle=1
+        )
 
         cls.category = Category.objects.create(name='Solar System')
 
@@ -105,6 +108,8 @@ class WebbTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'report_list.html')
         self.assertContains(response, 'Report List')
+        # Report with zero visits
+        self.assertContains(response, 'Empty!')
 
 
 class ReportParserTests(TestCase):
