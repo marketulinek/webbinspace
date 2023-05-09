@@ -3,10 +3,11 @@
 /* -------------- */
 body {
     background-color: black;
-    color: #AAA;
+    color: rgb(207, 207, 207);
+    font-family: "Dosis", sans-serif;
 }
 h1, .title { color: #FFC107; }
-h3, h4, h5, h6 { color: white; }
+h3, h4, h5, h6 { color: rgb(207, 207, 207); }
 h2, a, kbd { color: #CA6; }
 a:hover { color: #B39559; }
 
@@ -23,30 +24,29 @@ a:hover { color: #B39559; }
 
 
 /* ----------------- */
-/*      CHARTS       */
-/* ----------------- */
-.chart-card { background-color: rgb(28, 28, 30); }
-
-
-/* ----------------- */
 /*  (DJANGO) TABLES  */
 /* ----------------- */
 .table {
     margin-top: 20px;
     margin-bottom: 30px;
 }
+.table-dark { color: rgb(207, 207, 207); }
+.table-dark th,
+.table-dark td,
+.chart-card { background-color: rgb(28, 28, 30); }
 .page-link {
     background-color: transparent;
     border-color: rgb(55, 59, 62);
     color: #6c757d;
 }
 .page-link:hover {
-    background-color: #CA6;
-    border-color: #CA6;
+    background-color: rgb(255, 235, 180);
+    border-color: rgb(255, 235, 180);
     color: black;
 }
 .page-item.active .page-link {
     background-color: #FFC107;
+    background-image: linear-gradient(to right, rgb(230, 180, 2), rgb(250, 225, 60));
     border-color: #CA6;
     color: black;
 }
