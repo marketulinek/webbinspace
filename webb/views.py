@@ -1,10 +1,11 @@
 from django.contrib.humanize.templatetags.humanize import naturaltime
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from django.shortcuts import render, redirect
 from django.utils import timezone
+from django.views.generic import ListView
 from .chart import TimeSpentObservingChart
 from .filters import VisitFilter
-from .models import Visit, Category
+from .models import Report, Category, Visit
 from .tables import ObservingScheduleTable
 from .utils import get_observing_progress, convert_duration_to_days
 from django_filters.views import FilterView
@@ -135,3 +136,14 @@ class ObservingScheduleListView(SingleTableMixin, FilterView):
         return Visit.objects.select_related('category').filter(
             scheduled_start_time__isnull=False,
             valid=True).order_by('-scheduled_start_time')
+
+
+class ReportListView(ListView):
+    model = Report
+    template_name = 'report_list.html'
+    context_object_name = 'report_list'
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(cycle=self.kwargs['cycle_number']).annotate(
+            total_number=Count('visits__visit_id')).order_by('-date_code')
