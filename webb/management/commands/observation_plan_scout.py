@@ -72,7 +72,7 @@ class Command(BaseCommand):
             {'aria-label': re.compile('Cycle [0-9]+')}
         )
 
-        for head in cycle_headers:
+        for head in reversed(cycle_headers):
 
             cycle_number = head['aria-label'].split(' ')[1]
             cycle_body = content.find('div', {'aria-labelledby': head['id']})
