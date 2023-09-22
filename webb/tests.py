@@ -27,11 +27,12 @@ class WebbTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.report = Report.objects.create(
-            file_name='2219105f02_report_20220710', package_number='2219105f02', date_code='20220710', cycle=1
-        )
+            file_name='2219105f02_report_20220710', report_code='2219105f02_20220710',
+            package_number='2219105f02', date_code='20220710', cycle=1)
+
         cls.report_two = Report.objects.create(
-            file_name='20230423_report_20230421', package_number='2311308f03', date_code='20230421', cycle=1
-        )
+            file_name='20230423_report_20230421', report_code='2311308f03_20230421',
+            package_number='2311308f03', date_code='20230421', cycle=1)
 
         cls.category = Category.objects.create(name='Solar System')
 
@@ -52,6 +53,7 @@ class WebbTests(TestCase):
 
     def test_report_model(self):
         self.assertEqual(self.report.file_name, '2219105f02_report_20220710')
+        self.assertEqual(self.report.report_code, '2219105f02_20220710')
         self.assertEqual(self.report.package_number, '2219105f02')
         self.assertEqual(self.report.date_code, '20220710')
         self.assertEqual(self.report.cycle, 1)
@@ -115,7 +117,8 @@ class WebbTests(TestCase):
 class ReportParserTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.report = Report.objects.create(package_number='2219105f02', date_code='20220710', cycle=1)
+        cls.report = Report.objects.create(package_number='2219105f02', date_code='20220710',
+                                           report_code='2219105f02_20220710', cycle=1)
 
         cls.visit_one = Visit.objects.create(report=cls.report, visit_id='2739:4:1',
                                              scheduled_start_time='2022-07-14T19:00:00Z',

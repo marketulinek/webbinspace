@@ -6,7 +6,9 @@ from .utils import calculate_time_progress
 
 class Report(models.Model):
     file_name = models.CharField(max_length=30, default='')
-    package_number = models.CharField(max_length=10, unique=True)
+    # Consist of package_number + date_code to be unique
+    report_code = models.CharField(max_length=20, unique=True)
+    package_number = models.CharField(max_length=10)
     date_code = models.SmallIntegerField()
     cycle = models.SmallIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -36,10 +38,10 @@ class Category(models.Model):
 
 class Visit(models.Model):
     INSTRUMENT_CHOICES = (
-        ('1', 'NIRCam'),  # Near-Infrared Camera
-        ('2', 'NIRSpec'),  # Near-Infrared Spectrograph
-        ('3', 'MIRI'),  # Mid-InfraRed Instrument
-        ('4', 'NIRISS')  # Near-Infrared Imager and Slitless Spectrograph
+        ('1', 'NIRCam'),    # Near-Infrared Camera
+        ('2', 'NIRSpec'),   # Near-Infrared Spectrograph
+        ('3', 'MIRI'),      # Mid-InfraRed Instrument
+        ('4', 'NIRISS')     # Near-Infrared Imager and Slitless Spectrograph
     )
 
     report = models.ForeignKey(
