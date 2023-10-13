@@ -12,7 +12,7 @@ django-tables2==2.6.0
 flake8==6.1.0
 idna==3.4
 mccabe==0.7.0
-pycodestyle==2.11.0
+pycodestyle==2.11.1
 pyflakes==3.1.0
 python-decouple==3.8
 requests==2.31.0
