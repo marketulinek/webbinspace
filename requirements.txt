@@ -10,7 +10,7 @@ django-filter==24.2
 django_debug_toolbar==4.3.0
 django-tables2==2.7.0
 flake8==7.0.0
-idna==3.6
+idna==3.7
 mccabe==0.7.0
 pycodestyle==2.11.1
 pyflakes==3.2.0
