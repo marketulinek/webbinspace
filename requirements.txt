@@ -4,7 +4,7 @@ certifi==2024.7.4
 charset-normalizer==3.3.2
 crispy-bootstrap5==2024.2
 Django==5.0.7
-django-crispy-forms==2.2
+django-crispy-forms==2.3
 django-extensions==3.2.3
 django-filter==24.2
 django_debug_toolbar==4.4.6
