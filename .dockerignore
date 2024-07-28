@@ -1,12 +1,10 @@
-# Git
+**/__pycache__/
+
+.idea
+.venv
 .git
 .gitignore
-
-# Docker
 .docker
 
-# Python
-**/__pycache__/
-**/db.sqlite3
-.env
-venv/
+Dockerfile
+db.sqlite3

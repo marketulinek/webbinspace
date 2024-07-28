@@ -1,26 +1,15 @@
+version: "3.9"
+
 services:
-  webb-app:
+  web:
     container_name: webb
     image: webbinspace
     build: .
+    command: python /code/manage.py runserver 0.0.0.0:8000
     ports:
-      - 8000:8000 # expose ports - HOST:CONTAINER
+      - "8000:8000" # expose ports - HOST:CONTAINER
     env_file:
       - .env
     environment:
       - DEBUG=${DEBUG}
       - DEVELOPMENT_MODE=${DEVELOPMENT_MODE}
-      - DJANGO_LOG_LEVEL=${DJANGO_LOG_LEVEL}
-      #- DB_ENGINE=django.db.backends.postgresql
-      #- DB_NAME=
-      #- DB_USER=
-      #- DB_PASSWORD=
-      #- DB_HOST=webb-db
-      #- DB_PORT=5432
-
-  #webb-db:
-  #  image: postgres:15.1
-  #  environment:
-  #    - POSTGRES_DB=
-  #    - POSTGRES_USER=
-  #    - POSTGRES_PASSWORD=

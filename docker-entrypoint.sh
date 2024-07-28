@@ -9,3 +9,6 @@ sleep 5
 python manage.py migrate --noinput
 
 exec "$@"
+
+# NOTE: If the first line is causing the error,
+# try to change the ending style of file from CRLF to LF
