@@ -19,8 +19,6 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='webbinspace.cz,www.webbinspace.cz,127.0.0.1').split(',')
 
-DEVELOPMENT_MODE = config('DEVELOPMENT_MODE', default=False, cast=bool)
-
 
 # Application definition
 
@@ -60,7 +58,6 @@ ROOT_URLCONF = 'webbinspace.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        #'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -88,23 +85,12 @@ INTERNAL_IPS = [
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASE_URL = config('DATABASE_URL', default=None)
-USE_SQLITE = config('USE_SQLITE', default=True, cast=bool)
-
-if DEVELOPMENT_MODE or USE_SQLITE:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-elif len(sys.argv) > 0 and sys.argv[1] != 'collectstatic':
-    if DATABASE_URL is None:
-        raise NameError("DATABASE_URL environment variable not defined!")
-#    DATABASES = {
-#        'default': dj_database_url.parse(DATABASE_URL),
-#    }
-# TODO: https://github.com/jazzband/dj-database-url
+}
 
 
 # Password validation
