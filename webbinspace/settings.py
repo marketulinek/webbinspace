@@ -1,7 +1,7 @@
 from django.core.management.utils import get_random_secret_key
 from pathlib import Path
 from decouple import config
-import sys
+import socket
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -34,13 +34,18 @@ INSTALLED_APPS = [
     'webb.apps.WebbConfig',
 
     # Ext apps
-    'debug_toolbar',
     'django_tables2',
     'django_filters',
     'crispy_forms',
     'crispy_bootstrap5',
     'django_extensions',
 ]
+
+if DEBUG:
+    INSTALLED_APPS = [
+        *INSTALLED_APPS,    # unpacking existing APPS list
+        'debug_toolbar',
+    ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -50,8 +55,13 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware'
 ]
+
+if DEBUG:
+    MIDDLEWARE = [
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+        *MIDDLEWARE,
+    ]
 
 ROOT_URLCONF = 'webbinspace.urls'
 
@@ -72,14 +82,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'webbinspace.wsgi.application'
-
-
-# Django Debug Toolbar
-# https://django-debug-toolbar.readthedocs.io/en/latest/index.html
-
-INTERNAL_IPS = [
-    "127.0.0.1",
-]
 
 
 # Database
@@ -190,3 +192,11 @@ LOGGING = {
         }
     }
 }
+
+
+# Django Debug Toolbar (for Docker)
+# https://django-debug-toolbar.readthedocs.io/en/latest/installation.html
+# This ensures that INTERNAL_IPS matches the Docker host
+
+hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+INTERNAL_IPS = [ip[:-1] + '1' for ip in ips]
