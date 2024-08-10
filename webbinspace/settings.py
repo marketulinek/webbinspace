@@ -1,7 +1,6 @@
 from django.core.management.utils import get_random_secret_key
 from pathlib import Path
 from decouple import config
-import socket
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,12 +40,6 @@ INSTALLED_APPS = [
     'django_extensions',
 ]
 
-if DEBUG:
-    INSTALLED_APPS = [
-        *INSTALLED_APPS,    # unpacking existing APPS list
-        'debug_toolbar',
-    ]
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -56,12 +49,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-if DEBUG:
-    MIDDLEWARE = [
-        'debug_toolbar.middleware.DebugToolbarMiddleware',
-        *MIDDLEWARE,
-    ]
 
 ROOT_URLCONF = 'webbinspace.urls'
 
@@ -194,9 +181,22 @@ LOGGING = {
 }
 
 
-# Django Debug Toolbar (for Docker)
+# Django Debug Toolbar
 # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html
-# This ensures that INTERNAL_IPS matches the Docker host
 
-hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
-INTERNAL_IPS = [ip[:-1] + '1' for ip in ips]
+if DEBUG:
+    import socket
+
+    INSTALLED_APPS = [
+        *INSTALLED_APPS,    # unpacking existing APPS list
+        'debug_toolbar',
+    ]
+
+    MIDDLEWARE = [
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+        *MIDDLEWARE,
+    ]
+
+    # This ensures that INTERNAL_IPS matches the Docker host
+    hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+    INTERNAL_IPS = [ip[:-1] + '1' for ip in ips]
