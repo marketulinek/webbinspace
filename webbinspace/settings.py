@@ -1,7 +1,6 @@
 from django.core.management.utils import get_random_secret_key
 from pathlib import Path
 from decouple import config
-import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -11,15 +10,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
+# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 SECRET_KEY = config('SECRET_KEY', default=get_random_secret_key())
 
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='webbinspace.cz,www.webbinspace.cz,127.0.0.1').split(',')
-
-DEVELOPMENT_MODE = config('DEVELOPMENT_MODE', default=False, cast=bool)
 
 
 # Application definition
@@ -36,7 +33,6 @@ INSTALLED_APPS = [
     'webb.apps.WebbConfig',
 
     # Ext apps
-    'debug_toolbar',
     'django_tables2',
     'django_filters',
     'crispy_forms',
@@ -52,7 +48,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware'
 ]
 
 ROOT_URLCONF = 'webbinspace.urls'
@@ -60,7 +55,6 @@ ROOT_URLCONF = 'webbinspace.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        #'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -77,38 +71,19 @@ TEMPLATES = [
 WSGI_APPLICATION = 'webbinspace.wsgi.application'
 
 
-# Django Debug Toolbar
-# https://django-debug-toolbar.readthedocs.io/en/latest/index.html
-
-INTERNAL_IPS = [
-    "127.0.0.1",
-]
-
-
 # Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
+# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASE_URL = config('DATABASE_URL', default=None)
-USE_SQLITE = config('USE_SQLITE', default=True, cast=bool)
-
-if DEVELOPMENT_MODE or USE_SQLITE:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-elif len(sys.argv) > 0 and sys.argv[1] != 'collectstatic':
-    if DATABASE_URL is None:
-        raise NameError("DATABASE_URL environment variable not defined!")
-#    DATABASES = {
-#        'default': dj_database_url.parse(DATABASE_URL),
-#    }
-# TODO: https://github.com/jazzband/dj-database-url
+}
 
 
 # Password validation
-# https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
+# https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -127,7 +102,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/4.1/topics/i18n/
+# https://docs.djangoproject.com/en/5.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -140,7 +115,7 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.1/howto/static-files/
+# https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
@@ -148,7 +123,7 @@ STATICFILES_DIRS = [
 ]
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
+# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -162,7 +137,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 
 # Logging
-# https://docs.djangoproject.com/en/4.1/topics/logging/
+# https://docs.djangoproject.com/en/5.0/topics/logging/
 
 LOGGING = {
     'version': 1,
@@ -204,3 +179,24 @@ LOGGING = {
         }
     }
 }
+
+
+# Django Debug Toolbar
+# https://django-debug-toolbar.readthedocs.io/en/latest/installation.html
+
+if DEBUG:
+    import socket
+
+    INSTALLED_APPS = [
+        *INSTALLED_APPS,    # unpacking existing APPS list
+        'debug_toolbar',
+    ]
+
+    MIDDLEWARE = [
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+        *MIDDLEWARE,
+    ]
+
+    # This ensures that INTERNAL_IPS matches the Docker host
+    hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+    INTERNAL_IPS = [ip[:-1] + '1' for ip in ips]
