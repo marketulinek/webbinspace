@@ -6,6 +6,8 @@ services:
     image: webbinspace
     build: .
     command: python /code/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code  # <host_path>:<container_path>
     ports:
       - "8000:8000" # expose ports - HOST:CONTAINER
     env_file:
