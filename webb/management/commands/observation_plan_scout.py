@@ -1,12 +1,14 @@
-from django.core.management.base import BaseCommand
-from django.db import IntegrityError
-from webb.models import Report
+import logging
+import os
+import re
+import requests
+
 from bs4 import BeautifulSoup
 from decouple import config
-import requests
-import logging
-import re
-import os
+from django.core.management.base import BaseCommand
+from django.db import IntegrityError
+
+from webb.models import Report
 
 
 BASE_URL = 'https://www.stsci.edu'
