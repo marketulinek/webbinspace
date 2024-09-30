@@ -17,6 +17,19 @@ TARGET_URL = BASE_URL + '/jwst/science-execution/observing-schedules'
 logger = logging.getLogger(__name__)
 
 
+def get_search_expression(cycle=None):
+    """
+    Composes the search expression based on the given
+    (or not given) cycle number.
+    """
+    if cycle:
+        cycle_number_pattern = cycle
+    else:
+        cycle_number_pattern = '[0-9]+'
+
+    return f"Cycle {cycle_number_pattern}"
+
+
 def get_package_number(file_content):
     """
     Report file contains package number on the first line.
@@ -64,6 +77,9 @@ def get_site_content():
 class Command(BaseCommand):
     help = 'Scrapes url that contains report text files and downloads them to a predetermined folder.'
 
+    def add_arguments(self, parser):
+        parser.add_argument('-c', '--cycle', type=int, help='Indicates the number of specific cycle')
+
     def handle(self, *args, **options):
 
         logger.info('Scout started to work.')
@@ -71,7 +87,7 @@ class Command(BaseCommand):
         content = get_site_content()
         cycle_headers = content.find_all(
             'button',
-            {'aria-label': re.compile('Cycle [0-9]+')}
+            {'aria-label': re.compile(get_search_expression(options['cycle']))}
         )
 
         for head in reversed(cycle_headers):
