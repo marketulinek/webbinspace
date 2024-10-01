@@ -30,6 +30,15 @@ def get_search_expression(cycle=None):
     return f"Cycle {cycle_number_pattern}"
 
 
+def limit_links(links, report_count=None):
+    """
+    Limit links of reports to be processed if necessary.
+    """
+    if report_count:
+        return list(links)[:report_count]
+    return links
+
+
 def get_package_number(file_content):
     """
     Report file contains package number on the first line.
@@ -80,8 +89,14 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('-c', '--cycle', type=int, help='Indicates the number of specific cycle')
 
-    def handle(self, *args, **options):
+        parser.add_argument(
+            '-rc',
+            '--report_count',
+            type=int,
+            help='Specify the number of reports to be processed'
+        )
 
+    def handle(self, *args, **options):
         logger.info('Scout started to work.')
 
         content = get_site_content()
@@ -94,12 +109,15 @@ class Command(BaseCommand):
 
             cycle_number = head['aria-label'].split(' ')[1]
             cycle_body = content.find('div', {'aria-labelledby': head['id']})
-            links = cycle_body.find_all('a')
+            links = limit_links(
+                reversed(cycle_body.find_all('a')),
+                options['report_count']
+            )
 
             stored_reports = Report.objects.filter(
                 cycle=cycle_number).values_list('file_name', flat=True)
 
-            for link in reversed(links):
+            for link in links:
 
                 report_file_name = link['href'].split('/')[-1]
                 file_name = report_file_name.split('.')[0]
