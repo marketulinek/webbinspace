@@ -30,13 +30,14 @@ def get_search_expression(cycle=None):
     return f"Cycle {cycle_number_pattern}"
 
 
-def limit_links(links, report_count=None):
+def report_limit_reached(current_count, report_limit):
     """
-    Limit links of reports to be processed if necessary.
+    Determines if the number of reports reached its limit.
+    Always False if no limit is set.
     """
-    if report_count:
-        return list(links)[:report_count]
-    return links
+    if report_limit is None:
+        return False
+    return current_count >= report_limit
 
 
 def get_package_number(file_content):
@@ -99,6 +100,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         logger.info('Scout started to work.')
 
+        report_count = 0
         content = get_site_content()
         cycle_headers = content.find_all(
             'button',
@@ -109,15 +111,12 @@ class Command(BaseCommand):
 
             cycle_number = head['aria-label'].split(' ')[1]
             cycle_body = content.find('div', {'aria-labelledby': head['id']})
-            links = limit_links(
-                reversed(cycle_body.find_all('a')),
-                options['report_count']
-            )
+            links = cycle_body.find_all('a')
 
             stored_reports = Report.objects.filter(
                 cycle=cycle_number).values_list('file_name', flat=True)
 
-            for link in links:
+            for link in reversed(links):
 
                 report_file_name = link['href'].split('/')[-1]
                 file_name = report_file_name.split('.')[0]
@@ -150,6 +149,13 @@ class Command(BaseCommand):
 
                 # Save report file
                 save_report_file(cycle_number, report_file_name, report_file.content)
+                report_count += 1
                 logger.info('Report file saved.')
+
+                if report_limit_reached(report_count, options['report_count']):
+                    break
+
+            if report_limit_reached(report_count, options['report_count']):
+                break
 
         logger.info('Scout finished the work.')
