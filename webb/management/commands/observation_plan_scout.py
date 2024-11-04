@@ -1,18 +1,43 @@
-from django.core.management.base import BaseCommand
-from django.db import IntegrityError
-from webb.models import Report
+import logging
+import os
+import re
+import requests
+
 from bs4 import BeautifulSoup
 from decouple import config
-import requests
-import logging
-import re
-import os
+from django.core.management.base import BaseCommand
+from django.db import IntegrityError
+
+from webb.models import Report
 
 
 BASE_URL = 'https://www.stsci.edu'
 TARGET_URL = BASE_URL + '/jwst/science-execution/observing-schedules'
 
 logger = logging.getLogger(__name__)
+
+
+def get_search_expression(cycle=None):
+    """
+    Composes the search expression based on the given
+    (or not given) cycle number.
+    """
+    if cycle:
+        cycle_number_pattern = cycle
+    else:
+        cycle_number_pattern = '[0-9]+'
+
+    return f"Cycle {cycle_number_pattern}"
+
+
+def report_limit_reached(current_count, report_limit):
+    """
+    Determines if the number of reports reached its limit.
+    Always False if no limit is set.
+    """
+    if report_limit is None:
+        return False
+    return current_count >= report_limit
 
 
 def get_package_number(file_content):
@@ -62,14 +87,24 @@ def get_site_content():
 class Command(BaseCommand):
     help = 'Scrapes url that contains report text files and downloads them to a predetermined folder.'
 
-    def handle(self, *args, **options):
+    def add_arguments(self, parser):
+        parser.add_argument('-c', '--cycle', type=int, help='Indicates the number of specific cycle')
 
+        parser.add_argument(
+            '-rc',
+            '--report_count',
+            type=int,
+            help='Specify the number of reports to be processed'
+        )
+
+    def handle(self, *args, **options):
         logger.info('Scout started to work.')
 
+        report_count = 0
         content = get_site_content()
         cycle_headers = content.find_all(
             'button',
-            {'aria-label': re.compile('Cycle [0-9]+')}
+            {'aria-label': re.compile(get_search_expression(options['cycle']))}
         )
 
         for head in reversed(cycle_headers):
@@ -114,6 +149,13 @@ class Command(BaseCommand):
 
                 # Save report file
                 save_report_file(cycle_number, report_file_name, report_file.content)
+                report_count += 1
                 logger.info('Report file saved.')
+
+                if report_limit_reached(report_count, options['report_count']):
+                    break
+
+            if report_limit_reached(report_count, options['report_count']):
+                break
 
         logger.info('Scout finished the work.')
