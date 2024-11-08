@@ -5,9 +5,7 @@ from .utils import calculate_time_progress
 
 
 class Report(models.Model):
-    file_name = models.CharField(max_length=30, default='')
-    # Consist of package_number + date_code to be unique
-    report_code = models.CharField(max_length=20, unique=True)
+    file_name = models.CharField(max_length=30, unique=True)
     package_number = models.CharField(max_length=10)
     date_code = models.SmallIntegerField()
     cycle = models.SmallIntegerField()

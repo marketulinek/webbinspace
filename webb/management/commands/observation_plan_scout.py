@@ -130,21 +130,19 @@ class Command(BaseCommand):
                 report_file = requests.get(BASE_URL + link['href'])
                 package_number = get_package_number(report_file)
                 date_code = file_name.split('_report_')[1]
-                report_code = package_number + '_' + date_code
 
                 # Save heading to model Report
                 try:
                     report = Report(
                         file_name=file_name,
-                        report_code=report_code,
                         package_number=package_number,
                         date_code=date_code,
                         cycle=cycle_number
                     )
                     report.save()
                 except IntegrityError:
-                    logger.warning(f'The report with this report code '
-                                   f'"{report_code}" is already saved.')
+                    logger.warning(f'The report with this file name '
+                                   f'"{file_name}" is already saved.')
                     break
 
                 # Save report file
