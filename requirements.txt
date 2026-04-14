@@ -4,7 +4,7 @@ crispy-bootstrap5==2024.10
 Django>=5.0,<6.0
 django-crispy-forms==2.3
 django-extensions==3.2.3
-django-filter==25.1
+django-filter==25.2
 django_debug_toolbar==5.0.1
 django-tables2==2.7.5
 python-decouple==3.8
