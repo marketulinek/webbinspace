@@ -9,4 +9,4 @@ django_debug_toolbar==5.0.1
 django-tables2==2.7.5
 python-decouple==3.8
 requests>=2.32,<3.0
-sqlparse==0.5.3
+sqlparse==0.5.5
