@@ -1,4 +1,4 @@
-# Please see the documentation for all configuration options:
+# Documentation for all configuration options:
 # https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
 
 version: 2
@@ -10,7 +10,35 @@ updates:
       day: "friday"
       time: "19:10"
       timezone: "Europe/Prague"
+    open-pull-requests-limit: 5
     groups:
-      bundler:
+      # Django security updates (manual review)
+      Django-security-updates:
+        applies-to: security-updates
         patterns:
-          - '*'
+          - "Django"
+      # Safe autopilot updates (auto-merge via CI)
+      auto-patch-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
+      # Needs review
+      minor-updates:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+      # Visibility only (do NOT merge)
+      major-updates-notification:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - "major"
+    ignore:
+      # Block Django major upgrades (handled manually)
+      - dependency-name: "Django"
+        update-types: [ "version-update:semver-major" ]
