@@ -1,4 +1,4 @@
-asgiref==3.8.1
+asgiref==3.11.1
 beautifulsoup4>=4.13,<5.0
 crispy-bootstrap5==2024.10
 Django>=5.0,<6.0
