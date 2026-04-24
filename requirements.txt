@@ -1,5 +1,5 @@
 asgiref==3.8.1
-beautifulsoup4>=4.13,<5.0
+beautifulsoup4>=4.14.3,<5.0
 crispy-bootstrap5==2024.10
 Django>=5.0,<6.0
 django-crispy-forms==2.3
